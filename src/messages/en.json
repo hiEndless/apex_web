@@ -1,0 +1,25 @@
+{
+  "HomePage": {
+    "title": "Welcome to UTaker Dashboard",
+    "subtitle": "Your powerful dashboard for data management."
+  },
+  "Navigation": {
+    "dashboard": "Dashboard",
+    "auth": "Authentication",
+    "settings": "Settings"
+  },
+  "Dashboard": {
+    "welcome": "Hi, Welcome back 👋",
+    "totalRevenue": "Total Revenue",
+    "trendingUp": "Trending up this month",
+    "newCustomers": "New Customers",
+    "activeAccounts": "Active Accounts",
+    "growthRate": "Growth Rate",
+    "down": "Down {pct}% this period",
+    "steady": "Steady performance increase",
+    "visitors": "Visitors for the last 6 months",
+    "acquisition": "Acquisition needs attention",
+    "retention": "Strong user retention",
+    "projections": "Meets growth projections"
+  }
+}

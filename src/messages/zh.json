@@ -1,0 +1,25 @@
+{
+  "HomePage": {
+    "title": "欢迎使用 UTaker 仪表盘",
+    "subtitle": "您强大的数据管理仪表盘。"
+  },
+  "Navigation": {
+    "dashboard": "仪表盘",
+    "auth": "认证",
+    "settings": "设置"
+  },
+  "Dashboard": {
+    "welcome": "你好，欢迎回来 👋",
+    "totalRevenue": "总收入",
+    "trendingUp": "本月呈上升趋势",
+    "newCustomers": "新客户",
+    "activeAccounts": "活跃账户",
+    "growthRate": "增长率",
+    "down": "本期下降 {pct}%",
+    "steady": "业绩稳步增长",
+    "visitors": "过去 6 个月的访客",
+    "acquisition": "获客需要关注",
+    "retention": "用户留存强劲",
+    "projections": "符合增长预期"
+  }
+}
