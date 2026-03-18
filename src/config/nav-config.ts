@@ -34,89 +34,73 @@ import { NavItem } from '@/types';
  */
 export const navItems: NavItem[] = [
   {
-    title: 'Dashboard',
+    title: '主页',
     url: '/dashboard/overview',
     icon: 'dashboard',
     isActive: false,
     shortcut: ['d', 'd'],
     items: []
   },
+  // {
+  //   title: 'Workspaces',
+  //   url: '/dashboard/workspaces',
+  //   icon: 'workspace',
+  //   isActive: false,
+  //   items: []
+  // },
   {
-    title: 'Workspaces',
-    url: '/dashboard/workspaces',
-    icon: 'workspace',
-    isActive: false,
-    items: []
-  },
-  {
-    title: 'Teams',
-    url: '/dashboard/workspaces/team',
+    title: '跟单管理',
+    url: '/dashboard/copy-task',
     icon: 'teams',
     isActive: false,
     items: [],
     // Require organization to be active
-    access: { requireOrg: true }
+    // access: { requireOrg: true }
     // Alternative: require specific permission
     // access: { requireOrg: true, permission: 'org:teams:view' }
   },
   {
-    title: 'Product',
-    url: '/dashboard/product',
+    title: '交易员历史持仓',
+    url: '/dashboard/positions-history',
     icon: 'product',
     shortcut: ['p', 'p'],
     isActive: false,
     items: []
   },
+  // {
+  //   title: 'Kanban',
+  //   url: '/dashboard/kanban',
+  //   icon: 'kanban',
+  //   shortcut: ['k', 'k'],
+  //   isActive: false,
+  //   items: []
+  // },
   {
-    title: 'Kanban',
-    url: '/dashboard/kanban',
-    icon: 'kanban',
-    shortcut: ['k', 'k'],
-    isActive: false,
+    title: '会员服务',
+    url: '#', // Placeholder as there is no direct link for the parent
+    icon: 'billing',
+    isActive: true,
+    shortcut: ['v', 'v'],
     items: []
   },
   {
-    title: 'Pro',
+    title: '设置',
     url: '#', // Placeholder as there is no direct link for the parent
-    icon: 'pro',
+    icon: 'settings',
     isActive: true,
     items: [
       {
-        title: 'Exclusive',
-        url: '/dashboard/exclusive',
-        icon: 'exclusive',
-        shortcut: ['m', 'm']
-      }
-    ]
-  },
-  {
-    title: 'Account',
-    url: '#', // Placeholder as there is no direct link for the parent
-    icon: 'account',
-    isActive: true,
-    items: [
-      {
-        title: 'Profile',
-        url: '/dashboard/profile',
+        title: 'API 管理',
+        url: '/dashboard/api',
         icon: 'profile',
-        shortcut: ['m', 'm']
+        shortcut: ['a', 'a']
       },
       {
-        title: 'Billing',
-        url: '/dashboard/billing',
-        icon: 'billing',
-        shortcut: ['b', 'b'],
-        // Only show billing if in organization context
-        access: { requireOrg: true }
-        // Alternative: require billing management permission
-        // access: { requireOrg: true, permission: 'org:manage:billing' }
+        title: '消息通知',
+        url: '/dashboard/notifications',
+        icon: 'profile',
+        shortcut: ['n', 'n']
       },
-      {
-        title: 'Login',
-        shortcut: ['l', 'l'],
-        url: '/',
-        icon: 'login'
-      }
     ]
   }
 ];
