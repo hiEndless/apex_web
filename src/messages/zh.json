@@ -5,8 +5,18 @@
   },
   "Navigation": {
     "dashboard": "仪表盘",
-    "auth": "认证",
-    "settings": "设置"
+    "aiMonitoring": "AI 监控",
+    "marketAnalysis": "市场分析",
+    "riskMonitoring": "风控盯盘",
+    "tradeReview": "交易回顾",
+    "strategySignals": "策略信号",
+    "aiTrading": "AI 交易 (开发中)",
+    "chatBot": "Chat Bot (开发中)",
+    "settings": "设置",
+    "generalSettings": "通用设置",
+    "accountSettings": "账户设置",
+    "notificationSettings": "通知设置",
+    "agentSettings": "Agent 设置"
   },
   "Dashboard": {
     "welcome": "你好，欢迎回来 👋",
@@ -21,5 +31,119 @@
     "acquisition": "获客需要关注",
     "retention": "用户留存强劲",
     "projections": "符合增长预期"
+  },
+  "GeneralSettingsPage": {
+    "title": "通用设置",
+    "description": "管理您的首选项和应用程序设置。",
+    "languageAndRegion": {
+      "label": "语言和区域",
+      "description": "选择您喜欢的应用程序语言和区域格式。",
+      "options": {
+        "zh": "简体中文",
+        "en": "English",
+        "zh-TW": "繁體中文",
+        "ja": "日本語",
+        "ko": "한국어",
+        "es": "Español",
+        "pt": "Português",
+        "ar": "العربية",
+        "de": "Deutsch",
+        "ru": "Русский",
+        "fr": "Français",
+        "it": "Italiano"
+      }
+    },
+    "theme": {
+      "label": "主题",
+      "description": "选择浅色、深色或跟随系统。",
+      "options": {
+        "light": "浅色",
+        "dark": "深色",
+        "system": "跟随系统"
+      }
+    }
+  },
+  "AccountSettingsPage": {
+    "title": "账户设置",
+    "description": "管理您的交易所账号和模型服务商账号",
+    "exchangeList": {
+      "title": "交易所 API",
+      "description": "管理您的交易所 API 密钥"
+    },
+    "modelProviderList": {
+      "title": "模型服务提供商",
+      "description": "管理您的大语言模型提供商（例如 OpenAI, Anthropic）。"
+    },
+    "exchangeForm": {
+      "addButton": "添加交易所 API",
+      "dialog": {
+        "title": "添加交易所 API",
+        "description": "在此处输入您的交易所 API 凭据。"
+      },
+      "form": {
+        "exchange": "交易所",
+        "label": "备注",
+        "permissions": "权限",
+        "readOnly": "只读",
+        "trading": "交易",
+        "apiKey": "API Key",
+        "apiSecret": "API Secret",
+        "passphrase": "密码短语（可选）",
+        "addButton": "添加 API"
+      }
+    },
+    "modelProviderForm": {
+      "addButton": "添加模型提供商",
+      "dialog": {
+        "title": "添加模型提供商",
+        "description": "配置您的大语言模型提供商设置。"
+      },
+      "form": {
+        "provider": "提供商",
+        "baseUrl": "Base URL",
+        "apiKey": "API Key（可选）",
+        "addButton": "添加提供商"
+      }
+    },
+    "columns": {
+      "exchange": "交易所",
+      "label": "标签",
+      "apiKey": "API Key",
+      "createdAt": "创建时间",
+      "permissions": "权限",
+      "readOnly": "只读",
+      "trading": "交易",
+      "activeStatus": "激活状态",
+      "active": "激活",
+      "inactive": "未激活",
+      "configured": "已配置",
+      "missing": "缺失",
+      "ok": "正常",
+      "error": "错误",
+      "actions": "",
+      "provider": "提供商",
+      "baseUrl": "Base URL",
+      "status": "状态",
+      "Modal": {
+        "activateExchangeApi": "激活交易所 API？",
+        "activateExchangeApiDescription": "激活此 API 将重启监控服务并停止其他 API。",
+        "activateModelProvider": "激活模型提供商？",
+        "activateModelProviderDescription": "激活此提供商可能会影响正在运行的 Agent。",
+        "deactivateModelProvider": "停用模型提供商？",
+        "deactivateModelProviderDescription": "停用此提供商可能会导致依赖它的 Agent 无法工作。",
+        "confirmAndDeactivate": "确认并停用",
+        "deleteExchangeApi": "删除交易所 API？",
+        "deleteExchangeApiDescription": "您确定要删除此 API 密钥吗？此操作无法撤销。",
+        "deleteModelProvider": "删除模型提供商？",
+        "deleteModelProviderDescription": "您确定要删除此提供商吗？此操作无法撤销。",
+        "warning": "警告！",
+        "activateExchangeApiWarning": "激活此 API 将自动停用您账户中的所有其他交易所 API 并重启监控服务。",
+        "deleteExchangeApiWarning": "这将永久删除 API 密钥配置。",
+        "deleteModelProviderWarning": "这将永久删除提供商配置。",
+        "cancel": "取消",
+        "confirmAndActivate": "确认并激活",
+        "delete": "删除"
+      }
+    }
   }
 }

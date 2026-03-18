@@ -5,8 +5,18 @@
   },
   "Navigation": {
     "dashboard": "Dashboard",
-    "auth": "Authentication",
-    "settings": "Settings"
+    "aiMonitoring": "AI Monitoring",
+    "marketAnalysis": "Market Analysis",
+    "riskMonitoring": "Risk Monitoring",
+    "tradeReview": "Trade Review",
+    "strategySignals": "Strategy Signals",
+    "aiTrading": "AI Trading (In Development)",
+    "chatBot": "Chat Bot (In Development)",
+    "settings": "Settings",
+    "generalSettings": "General Settings",
+    "accountSettings": "Account Settings",
+    "notificationSettings": "Notification Settings",
+    "agentSettings": "Agent Settings"
   },
   "Dashboard": {
     "welcome": "Hi, Welcome back 👋",
@@ -21,5 +31,119 @@
     "acquisition": "Acquisition needs attention",
     "retention": "Strong user retention",
     "projections": "Meets growth projections"
+  },
+  "GeneralSettingsPage": {
+    "title": "General Settings",
+    "description": "Manage your preferences and application settings.",
+    "languageAndRegion": {
+      "label": "Language & Region",
+      "description": "Select your preferred app language and regional format.",
+      "options": {
+        "zh": "Simplified Chinese",
+        "en": "English",
+        "zh-TW": "Traditional Chinese",
+        "ja": "Japanese",
+        "ko": "Korean",
+        "es": "Spanish",
+        "pt": "Portuguese",
+        "ar": "Arabic",
+        "de": "German",
+        "ru": "Russian",
+        "fr": "French",
+        "it": "Italian"
+      }
+    },
+    "theme": {
+      "label": "Theme",
+      "description": "Choose light, dark, or follow system.",
+      "options": {
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      }
+    }
+  },
+  "AccountSettingsPage": {
+    "title": "Account Settings",
+    "description": "Manage your exchange accounts and model provider accounts.",
+    "exchangeList": {
+      "title": "Exchange APIs",
+      "description": "Manage your exchange API keys. Only one API can be active at a time."
+    },
+    "modelProviderList": {
+      "title": "Model Service Providers",
+      "description": "Manage your LLM providers (e.g. OpenAI, Anthropic)."
+    },
+    "exchangeForm": {
+      "addButton": "Add Exchange API",
+      "dialog": {
+        "title": "Add Exchange API",
+        "description": "Enter your exchange API credentials here."
+      },
+      "form": {
+        "exchange": "Exchange",
+        "label": "Label (Optional)",
+        "permissions": "Permissions",
+        "readOnly": "Read-only",
+        "trading": "Trading (Not available yet)",
+        "apiKey": "API Key",
+        "apiSecret": "API Secret",
+        "passphrase": "Passphrase (Optional)",
+        "addButton": "Add API"
+      }
+    },
+    "modelProviderForm": {
+      "addButton": "Add Model Provider",
+      "dialog": {
+        "title": "Add Model Provider",
+        "description": "Configure your Large Language Model provider settings."
+      },
+      "form": {
+        "provider": "Provider",
+        "baseUrl": "Base URL",
+        "apiKey": "API Key (Optional)",
+        "addButton": "Add Provider"
+      }
+    },
+    "columns": {
+      "exchange": "Exchange",
+      "label": "Label",
+      "apiKey": "API Key",
+      "createdAt": "Created At",
+      "permissions": "Permissions",
+      "readOnly": "Read-only",
+      "trading": "Trading",
+      "activeStatus": "Active Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "configured": "Configured",
+      "missing": "Missing",
+      "ok": "OK",
+      "error": "Error",
+      "actions": "",
+      "provider": "Provider",
+      "baseUrl": "Base URL",
+      "status": "Status",
+      "Modal": {
+        "activateExchangeApi": "Activate Exchange API?",
+        "activateExchangeApiDescription": "Activating this API will restart the monitoring service and stop other APIs.",
+        "activateModelProvider": "Activate Model Provider?",
+        "activateModelProviderDescription": "Activating this provider might affect running agents.",
+        "deactivateModelProvider": "Deactivate Model Provider?",
+        "deactivateModelProviderDescription": "Deactivating this provider may cause agents depending on it to stop working.",
+        "confirmAndDeactivate": "Confirm & Deactivate",
+        "deleteExchangeApi": "Delete Exchange API?",
+        "deleteExchangeApiDescription": "Are you sure you want to delete this API key? This action cannot be undone.",
+        "deleteModelProvider": "Delete Model Provider?",
+        "deleteModelProviderDescription": "Are you sure you want to delete this provider? This action cannot be undone.",
+        "warning": "Warning!",
+        "activateExchangeApiWarning": "Activating this API will automatically deactivate all other exchange APIs for your account and restart the monitoring service.",
+        "deleteExchangeApiWarning": "This will permanently remove the API key configuration.",
+        "deleteModelProviderWarning": "This will permanently remove the provider configuration.",
+        "cancel": "Cancel",
+        "confirmAndActivate": "Confirm & Activate",
+        "delete": "Delete"
+      }
+    }
   }
 }

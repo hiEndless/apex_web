@@ -77,7 +77,7 @@ export const navItems: NavItem[] = [
   // },
   {
     title: '会员服务',
-    url: '#', // Placeholder as there is no direct link for the parent
+    url: '/dashboard/billing', // Placeholder as there is no direct link for the parent
     icon: 'billing',
     isActive: true,
     shortcut: ['v', 'v'],
@@ -91,7 +91,7 @@ export const navItems: NavItem[] = [
     items: [
       {
         title: 'API 管理',
-        url: '/dashboard/api',
+        url: '/dashboard/api-settings',
         icon: 'profile',
         shortcut: ['a', 'a']
       },
