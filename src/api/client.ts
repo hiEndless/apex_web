@@ -1,4 +1,4 @@
-export const API_BASE_URL = process.env.NEXT_PUBLIC_MY_API_BASE_URL || 'http://localhost:9931';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_MY_API_BASE_URL || 'http://localhost:8888';
 
 export interface BaseResponse<T> {
   code: number;
