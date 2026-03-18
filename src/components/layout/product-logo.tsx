@@ -16,21 +16,19 @@ export function ProductLogo() {
           className={`data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground`}
         >
           <Link href="/">
-            <div className={`relative transition-all duration-200 ${state === 'collapsed' ? 'h-8 w-8' : 'h-8 w-full'}`}>
-               <Image 
-                 src="/black-logo.png" 
-                 alt="UTaker Logo" 
-                 fill 
-                 className="object-contain dark:hidden object-left"
-                 priority
-               />
-               <Image 
-                 src="/white-logo.png" 
-                 alt="UTaker Logo" 
-                 fill 
-                 className="object-contain hidden dark:block object-left"
-                 priority
-               />
+            <div className={`flex items-center gap-2 transition-all duration-200 ${state === 'collapsed' ? 'w-8' : 'w-full'}`}>
+              <div className="relative h-8 w-8">
+                <Image 
+                  src="/logo.png"
+                  alt="Logo"
+                  fill 
+                  className="object-contain"
+                  priority
+                />
+              </div>
+              {!state || state !== 'collapsed' ? (
+                <span className="font-semibold text-lg">ApeX Studio</span>
+              ) : null}
             </div>
           </Link>
         </SidebarMenuButton>
