@@ -41,4 +41,7 @@ export const authApi = {
 
   register: (payload: RegisterPayload) =>
     apiClient.post<RegisterResult>('/api/auth/register', payload, AUTH_OPTIONS),
+
+  refresh: (payload: { refresh_token: string }) =>
+    apiClient.post<LoginResult>('/api/auth/refresh', payload, AUTH_OPTIONS),
 };

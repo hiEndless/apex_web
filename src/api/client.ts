@@ -1,4 +1,9 @@
-import { AUTH_TOKEN_STORAGE_KEY } from '@/constants/auth-token';
+import {
+  AUTH_REFRESH_TOKEN_STORAGE_KEY,
+  AUTH_TOKEN_STORAGE_KEY,
+} from '@/constants/auth-token';
+
+import { clearAuthToken, persistAuthToken, persistRefreshToken } from '@/lib/auth-session';
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_MY_API_BASE_URL || 'http://localhost:8888';
 
@@ -80,45 +85,108 @@ interface RequestOptions {
 
 export const apiClient = {
   get: async <T>(url: string, options: RequestOptions = {}): Promise<T> => {
-    const response = await fetch(`${API_BASE_URL}${url}`, {
-      method: 'GET',
-      headers: { ...getHeaders(options.skipAuth), ...options.headers },
-    });
-    return handleResponse<T>(response);
+    return requestWithAutoRefresh<T>('GET', url, undefined, options);
   },
 
   post: async <T>(url: string, body: any, options: RequestOptions = {}): Promise<T> => {
-    const response = await fetch(`${API_BASE_URL}${url}`, {
-      method: 'POST',
-      headers: { ...getHeaders(options.skipAuth), ...options.headers },
-      body: JSON.stringify(body),
-    });
-    return handleResponse<T>(response);
+    return requestWithAutoRefresh<T>('POST', url, body, options);
   },
 
   patch: async <T>(url: string, body: any, options: RequestOptions = {}): Promise<T> => {
-    const response = await fetch(`${API_BASE_URL}${url}`, {
-      method: 'PATCH',
-      headers: { ...getHeaders(options.skipAuth), ...options.headers },
-      body: JSON.stringify(body),
-    });
-    return handleResponse<T>(response);
+    return requestWithAutoRefresh<T>('PATCH', url, body, options);
   },
 
   put: async <T>(url: string, body: any, options: RequestOptions = {}): Promise<T> => {
-    const response = await fetch(`${API_BASE_URL}${url}`, {
-      method: 'PUT',
-      headers: { ...getHeaders(options.skipAuth), ...options.headers },
-      body: JSON.stringify(body),
-    });
-    return handleResponse<T>(response);
+    return requestWithAutoRefresh<T>('PUT', url, body, options);
   },
 
   delete: async <T>(url: string, options: RequestOptions = {}): Promise<T> => {
-    const response = await fetch(`${API_BASE_URL}${url}`, {
-      method: 'DELETE',
-      headers: { ...getHeaders(options.skipAuth), ...options.headers },
-    });
-    return handleResponse<T>(response);
+    return requestWithAutoRefresh<T>('DELETE', url, undefined, options);
   },
 };
+
+const AUTH_EXPIRE_CODE_SET = new Set<number>([2002, 2003, 2004, 2005]);
+
+let refreshInFlight: Promise<boolean> | null = null;
+
+function getCurrentLocalePrefix(): string {
+  if (typeof window === 'undefined') return '';
+  const segments = window.location.pathname.split('/').filter(Boolean);
+  const first = segments[0];
+  if (first === 'zh' || first === 'en') return `/${first}`;
+  return '';
+}
+
+function redirectToSignIn() {
+  if (typeof window === 'undefined') return;
+  const prefix = getCurrentLocalePrefix();
+  window.location.replace(`${prefix}/auth/sign-in`);
+}
+
+async function refreshAccessToken(): Promise<boolean> {
+  if (typeof window === 'undefined') return false;
+
+  const refreshToken = localStorage.getItem(AUTH_REFRESH_TOKEN_STORAGE_KEY);
+  if (!refreshToken) return false;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
+      method: 'POST',
+      headers: { ...getHeaders(true) },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
+
+    const data = await handleResponse<any>(response);
+    if (!data?.access_token || !data?.refresh_token) return false;
+    persistAuthToken(data.access_token);
+    persistRefreshToken(data.refresh_token);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function ensureRefreshed(): Promise<boolean> {
+  if (refreshInFlight) return refreshInFlight;
+  refreshInFlight = refreshAccessToken().finally(() => {
+    refreshInFlight = null;
+  });
+  return refreshInFlight;
+}
+
+async function requestWithAutoRefresh<T>(
+  method: string,
+  url: string,
+  body: any,
+  options: RequestOptions,
+  retry = true,
+): Promise<T> {
+  const skipAuth = options.skipAuth ?? false;
+
+  const headers = { ...getHeaders(skipAuth), ...options.headers };
+
+  const fetchOptions: RequestInit = {
+    method,
+    headers,
+  };
+  if (body !== undefined) {
+    fetchOptions.body = JSON.stringify(body);
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}${url}`, fetchOptions);
+    return handleResponse<T>(response);
+  } catch (err) {
+    if (!retry || skipAuth) throw err;
+    if (!(err instanceof ApiError)) throw err;
+    if (!AUTH_EXPIRE_CODE_SET.has(err.code ?? -1)) throw err;
+    const ok = await ensureRefreshed();
+    if (!ok) {
+      clearAuthToken();
+      redirectToSignIn();
+      throw err;
+    }
+    // refresh 后重试一次
+    return requestWithAutoRefresh<T>(method, url, body, options, false);
+  }
+}

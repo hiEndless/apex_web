@@ -4,6 +4,9 @@ export const AUTH_TOKEN_STORAGE_KEY = 'jwt'
 
 export const AUTH_TOKEN_COOKIE_NAME = 'apex_access_token'
 
+/** 仅前端存储，用于自动续期。 */
+export const AUTH_REFRESH_TOKEN_STORAGE_KEY = 'apex_refresh_token'
+
 /** 与后端会话周期大致对齐（秒） */
 export const AUTH_TOKEN_COOKIE_MAX_AGE_SEC = 60 * 60 * 24 * 7
 

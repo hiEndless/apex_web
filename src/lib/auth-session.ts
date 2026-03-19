@@ -4,6 +4,7 @@ import {
   AUTH_TOKEN_COOKIE_MAX_AGE_SEC,
   AUTH_TOKEN_COOKIE_NAME,
   AUTH_TOKEN_STORAGE_KEY,
+  AUTH_REFRESH_TOKEN_STORAGE_KEY,
   SESSION_STUDIO_NAME_KEY,
   SESSION_USERNAME_KEY,
 } from '@/constants/auth-token'
@@ -15,9 +16,15 @@ export function persistAuthToken(token: string) {
   document.cookie = `${AUTH_TOKEN_COOKIE_NAME}=${encodeURIComponent(token)}; Path=/; Max-Age=${AUTH_TOKEN_COOKIE_MAX_AGE_SEC}; SameSite=Lax${secure}`
 }
 
+export function persistRefreshToken(token: string) {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(AUTH_REFRESH_TOKEN_STORAGE_KEY, token)
+}
+
 export function clearAuthToken() {
   if (typeof window === 'undefined') return
   localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY)
+  localStorage.removeItem(AUTH_REFRESH_TOKEN_STORAGE_KEY)
   localStorage.removeItem(SESSION_USERNAME_KEY)
   localStorage.removeItem(SESSION_STUDIO_NAME_KEY)
   const secure = window.location.protocol === 'https:' ? '; Secure' : ''

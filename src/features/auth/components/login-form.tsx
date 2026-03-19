@@ -6,7 +6,7 @@ import { EyeIcon, EyeOffIcon } from 'lucide-react'
 
 import { ApiError } from '@/api/client'
 import { authApi } from '@/api/auth'
-import { persistAuthToken, persistSessionDisplay } from '@/lib/auth-session'
+import { persistAuthToken, persistRefreshToken, persistSessionDisplay } from '@/lib/auth-session'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
@@ -31,6 +31,7 @@ const LoginForm = () => {
         password,
       })
       persistAuthToken(data.access_token)
+      persistRefreshToken(data.refresh_token)
       persistSessionDisplay({
         username: data.username,
         studio_name: data.studio_name,
