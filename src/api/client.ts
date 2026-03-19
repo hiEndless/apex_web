@@ -3,7 +3,12 @@ import {
   AUTH_TOKEN_STORAGE_KEY,
 } from '@/constants/auth-token';
 
-import { clearAuthToken, persistAuthToken, persistRefreshToken } from '@/lib/auth-session';
+import {
+  clearAuthToken,
+  persistAuthToken,
+  persistRefreshToken,
+  persistSessionDisplay,
+} from '@/lib/auth-session';
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_MY_API_BASE_URL || 'http://localhost:8888';
 
@@ -120,7 +125,34 @@ export const apiClient = {
   },
 };
 
-const AUTH_EXPIRE_CODE_SET = new Set<number>([2002, 2003, 2004, 2005]);
+/** 访问令牌失效类业务码：应尝试 refresh 后重试一次 */
+export const AUTH_EXPIRE_RETRY_CODES = new Set<number>([2002, 2003, 2004, 2005]);
+
+/** 距 access JWT 过期不足该毫秒数时，发业务请求前先刷新 */
+const PROACTIVE_REFRESH_LEAD_MS = 120_000;
+
+function decodeJwtExpMs(accessToken: string): number | null {
+  try {
+    const parts = accessToken.split('.');
+    if (parts.length < 2) return null;
+    const payloadB64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const padding = '='.repeat((4 - (payloadB64.length % 4)) % 4);
+    const json = window.atob(payloadB64 + padding);
+    const payload = JSON.parse(json);
+    const expSec = Number(payload?.exp);
+    return Number.isFinite(expSec) ? expSec * 1000 : null;
+  } catch {
+    return null;
+  }
+}
+
+/** 当前 localStorage 中 access token 的过期时刻（ms），无法解析则 null */
+export function getAccessTokenExpiryMs(): number | null {
+  if (typeof window === 'undefined') return null;
+  const accessToken = localStorage.getItem(AUTH_TOKEN_STORAGE_KEY);
+  if (!accessToken) return null;
+  return decodeJwtExpMs(accessToken);
+}
 
 let refreshInFlight: Promise<boolean> | null = null;
 
@@ -155,6 +187,12 @@ async function refreshAccessToken(): Promise<boolean> {
     if (!data?.access_token || !data?.refresh_token) return false;
     persistAuthToken(data.access_token);
     persistRefreshToken(data.refresh_token);
+    if (typeof data.username === 'string') {
+      persistSessionDisplay({
+        username: data.username,
+        studio_name: data.studio_name ?? null,
+      });
+    }
     return true;
   } catch {
     return false;
@@ -178,6 +216,13 @@ async function requestWithAutoRefresh<T>(
 ): Promise<T> {
   const skipAuth = options.skipAuth ?? false;
 
+  if (!skipAuth && typeof window !== 'undefined') {
+    const expMs = getAccessTokenExpiryMs();
+    if (expMs != null && expMs - Date.now() < PROACTIVE_REFRESH_LEAD_MS) {
+      await ensureRefreshed();
+    }
+  }
+
   const headers = { ...getHeaders(skipAuth), ...options.headers };
 
   const fetchOptions: RequestInit = {
@@ -195,7 +240,7 @@ async function requestWithAutoRefresh<T>(
     const err = normalizeRequestError(rawErr);
     if (!retry || skipAuth) throw err;
     if (!(err instanceof ApiError)) throw err;
-    if (!AUTH_EXPIRE_CODE_SET.has(err.code ?? -1)) throw err;
+    if (!AUTH_EXPIRE_RETRY_CODES.has(err.code ?? -1)) throw err;
     const ok = await ensureRefreshed();
     if (!ok) {
       clearAuthToken();

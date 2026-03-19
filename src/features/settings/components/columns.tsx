@@ -9,15 +9,11 @@ import { toast } from 'sonner';
 import { settingsApi } from '@/api/settings';
 import { AlertTriangle, Trash2 } from 'lucide-react';
 import Image from 'next/image';
+import { EXCHANGE_LOGO_SRC } from '@/constants/exchange-logo';
 import {
   clearActiveExchangeFromLocalStorage,
   getActiveExchangeFromLocalStorage,
 } from '@/lib/active-exchange';
-
-const EXCHANGE_LOGO_SRC: Record<string, string> = {
-  binance: '/exchange_logo/binance.png',
-  okx: '/exchange_logo/okx.png',
-};
 
 export const ExchangeCell = ({ platform }: { platform: string }) => {
   const key = (platform || '').trim().toLowerCase();

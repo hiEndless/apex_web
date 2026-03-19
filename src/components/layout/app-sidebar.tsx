@@ -48,9 +48,11 @@ import {
 } from '@/lib/auth-session';
 import { authApi } from '@/api/auth';
 import {
-  AUTH_REFRESH_TOKEN_STORAGE_KEY,
-  AUTH_TOKEN_STORAGE_KEY,
-} from '@/constants/auth-token';
+  ApiError,
+  AUTH_EXPIRE_RETRY_CODES,
+  getAccessTokenExpiryMs,
+} from '@/api/client';
+import { AUTH_REFRESH_TOKEN_STORAGE_KEY } from '@/constants/auth-token';
 import * as React from 'react';
 import { Icons } from '../icons';
 import { ProductLogo } from './product-logo';
@@ -72,31 +74,17 @@ export default function AppSidebar() {
     let timerId: number | null = null;
     const refreshInFlightRef = { current: false };
 
-    function decodeJwtExp(accessToken: string): number | null {
-      try {
-        const parts = accessToken.split('.');
-        if (parts.length < 2) return null;
-        const payloadB64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-        const padding = '='.repeat((4 - (payloadB64.length % 4)) % 4);
-        const json = window.atob(payloadB64 + padding);
-        const payload = JSON.parse(json);
-        const exp = Number(payload?.exp);
-        return Number.isFinite(exp) ? exp : null;
-      } catch {
-        return null;
-      }
-    }
+    type RefreshOnceResult = 'ok' | 'auth_fail' | 'retry_soon';
 
-    async function refreshOnce() {
-      if (cancelled) return;
-      if (refreshInFlightRef.current) return;
+    async function refreshOnce(): Promise<RefreshOnceResult> {
+      if (cancelled) return 'ok';
+      if (refreshInFlightRef.current) return 'ok';
       refreshInFlightRef.current = true;
       try {
         const refreshToken = localStorage.getItem(AUTH_REFRESH_TOKEN_STORAGE_KEY);
-        const accessToken = localStorage.getItem(AUTH_TOKEN_STORAGE_KEY);
-        if (!refreshToken || !accessToken) {
+        if (!refreshToken) {
           signOut(router);
-          return;
+          return 'auth_fail';
         }
 
         const data = await authApi.refresh({ refresh_token: refreshToken });
@@ -106,31 +94,55 @@ export default function AppSidebar() {
           username: data.username,
           studio_name: data.studio_name,
         });
-      } catch {
-        signOut(router);
+        return 'ok';
+      } catch (err) {
+        const fatal =
+          err instanceof ApiError &&
+          err.code != null &&
+          AUTH_EXPIRE_RETRY_CODES.has(err.code);
+        if (fatal) {
+          signOut(router);
+          return 'auth_fail';
+        }
+        return 'retry_soon';
       } finally {
         refreshInFlightRef.current = false;
       }
     }
 
-    function scheduleNext() {
+    function scheduleNext(networkRetryMs?: number) {
       if (cancelled) return;
       if (timerId) window.clearTimeout(timerId);
 
-      const accessToken = localStorage.getItem(AUTH_TOKEN_STORAGE_KEY);
       const refreshToken = localStorage.getItem(AUTH_REFRESH_TOKEN_STORAGE_KEY);
       if (!refreshToken) return;
 
-      const expSec = accessToken ? decodeJwtExp(accessToken) : null;
-      // 提前 60s 刷新；最小间隔 30s，避免抖动/死循环
       const nowMs = Date.now();
-      const nextDelayMs = expSec
-        ? Math.max(30_000, expSec * 1000 - nowMs - 60_000)
-        : 5 * 60_000;
+      const expMs = getAccessTokenExpiryMs();
+
+      let nextDelayMs: number;
+      if (networkRetryMs != null) {
+        nextDelayMs = networkRetryMs;
+      } else if (expMs == null) {
+        // 无有效 access 或无法解析 exp：尽快续期，避免误用 5 分钟固定间隔
+        nextDelayMs = 0;
+      } else {
+        const msLeft = expMs - nowMs;
+        const leadMs = 60_000;
+        if (msLeft <= 0) {
+          nextDelayMs = 0;
+        } else if (msLeft <= 90_000) {
+          // 剩余不足约 90s 时不能再套「至少 30s 后再刷新」，否则会在过期后才刷新
+          nextDelayMs = Math.max(0, msLeft - 10_000);
+        } else {
+          nextDelayMs = msLeft - leadMs;
+        }
+      }
 
       timerId = window.setTimeout(async () => {
-        await refreshOnce();
-        scheduleNext();
+        const result = await refreshOnce();
+        if (result === 'auth_fail') return;
+        scheduleNext(result === 'retry_soon' ? 15_000 : undefined);
       }, nextDelayMs);
     }
 
