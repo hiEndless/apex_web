@@ -32,15 +32,15 @@ import { UserAvatarProfile } from '@/components/user-avatar-profile';
 import { navItems } from '@/config/nav-config';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useFilteredNavItems } from '@/hooks/use-nav';
+import { useSessionDisplayUser } from '@/hooks/use-session-display-user';
 import {
-  IconBell,
   IconChevronRight,
   IconChevronsDown,
-  IconCreditCard,
   IconLogout,
   IconUserCircle
 } from '@tabler/icons-react';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
+import { signOut } from '@/lib/auth-session';
 import * as React from 'react';
 import { Icons } from '../icons';
 import { ProductLogo } from './product-logo';
@@ -48,12 +48,7 @@ import { ProductLogo } from './product-logo';
 export default function AppSidebar() {
   const pathname = usePathname();
   const { isOpen } = useMediaQuery();
-  const user = {
-    fullName: 'Demo User',
-    emailAddresses: [{ emailAddress: 'demo@example.com' }],
-    imageUrl: ''
-  };
-  const organization = { id: 'org_1', name: 'Demo Org' };
+  const user = useSessionDisplayUser();
   const router = useRouter();
   const filteredItems = useFilteredNavItems(navItems);
 
@@ -185,7 +180,8 @@ export default function AppSidebar() {
                   {/*</DropdownMenuItem>*/}
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => router.push('/auth/sign-in')}>
+                
+                <DropdownMenuItem onClick={() => signOut(router)}>
                   <IconLogout className='mr-2 h-4 w-4' />
                   Log out
                 </DropdownMenuItem>

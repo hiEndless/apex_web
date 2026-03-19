@@ -1,29 +1,27 @@
+/** 与后端 `exchange_accounts._serialize_api_info` 对齐 */
 export interface ExchangeAccount {
-  id: string;
-  exchange: string;
-  api_key_masked: string | null;
-  api_label: string | null;
-  is_read_only: boolean;
-  is_active: boolean;
-  has_api_secret: boolean;
-  has_api_passphrase: boolean;
-  created_at: string;
-  updated_at: string;
+  id: number;
+  user_id: number;
+  studio_id: number;
+  api_name: string;
+  platform: string;
+  flag: number;
+  status: number;
+  is_readonly: boolean;
+  usdt: number;
+  uid: string | null;
+  created_at: string | null;
 }
 
+/** 与后端 `CreateApiRequest` 对齐 */
 export interface ExchangeAccountCreate {
-  exchange: string;
-  api_key?: string;
-  api_secret?: string;
-  api_passphrase?: string;
-  api_label?: string;
-  is_read_only?: boolean;
-  is_active?: boolean;
-}
-
-export interface ExchangeAccountUpdate {
-  is_active?: boolean;
-  api_label?: string;
+  platform: string;
+  is_readonly: boolean;
+  api_name: string;
+  passphrase: string;
+  api_key: string;
+  secret_key: string;
+  flag?: number;
 }
 
 export interface ModelProvider {

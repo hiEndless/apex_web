@@ -10,14 +10,13 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { UserAvatarProfile } from '@/components/user-avatar-profile';
-import { useRouter } from 'next/navigation';
+import { useSessionDisplayUser } from '@/hooks/use-session-display-user';
+import { useRouter } from '@/i18n/navigation';
+import { signOut } from '@/lib/auth-session';
+
 export function UserNav() {
   const router = useRouter();
-  const user = {
-    fullName: 'Demo User',
-    emailAddresses: [{ emailAddress: 'demo@example.com' }],
-    imageUrl: ''
-  };
+  const user = useSessionDisplayUser();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -33,11 +32,9 @@ export function UserNav() {
       >
         <DropdownMenuLabel className='font-normal'>
           <div className='flex flex-col space-y-1'>
-            <p className='text-sm leading-none font-medium'>
-              {user.fullName}
-            </p>
+            <p className='text-sm leading-none font-medium'>{user.fullName}</p>
             <p className='text-muted-foreground text-xs leading-none'>
-              {user.emailAddresses[0].emailAddress}
+              {user.emailAddresses[0]?.emailAddress}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -51,7 +48,7 @@ export function UserNav() {
           {/*<DropdownMenuItem>New Team</DropdownMenuItem>*/}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => router.push('/auth/sign-in')}>
+        <DropdownMenuItem onClick={() => signOut(router)}>
           Log out
         </DropdownMenuItem>
       </DropdownMenuContent>

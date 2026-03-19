@@ -5,6 +5,7 @@ import { AlertCircle, Loader2, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLocale } from 'next-intl';
 
+import { ApiError } from '@/api/client';
 import PageContainer from '@/components/layout/page-container';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -28,6 +29,16 @@ const StatusDot = ({ enabled }: { enabled: boolean }) => (
     )}
   </div>
 );
+
+function getErrorMessage(error: unknown) {
+  if (error instanceof ApiError) return error.message;
+  if (error instanceof Error) return error.message;
+  try {
+    return JSON.stringify(error);
+  } catch {
+    return '操作失败';
+  }
+}
 
 export default function NotificationPage() {
   const locale = useLocale();
@@ -55,6 +66,7 @@ export default function NotificationPage() {
         console.error('Failed to fetch channels from API, using static channels:', error);
         setChannels(STATIC_CHANNELS);
         setSelectedChannelId(STATIC_CHANNELS[0].id);
+        toast.error(`获取通知渠道失败：${getErrorMessage(error)}`);
       } finally {
         setIsLoading(false);
       }
@@ -82,10 +94,10 @@ export default function NotificationPage() {
         c.channel_type === updatedChannel.channel_type ? updatedChannel : c
       ));
 
-      toast.success('Configuration saved successfully');
+      toast.success('配置已保存');
     } catch (error) {
       console.error('Failed to save:', error);
-      toast.error('Failed to save configuration');
+      toast.error(`保存失败：${getErrorMessage(error)}`);
     } finally {
       setIsSaving(false);
     }
@@ -95,10 +107,10 @@ export default function NotificationPage() {
     if (!selectedChannelId) return;
     setIsTesting(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success('Test notification sent!');
+      await notificationApi.testChannel(selectedChannelId);
+      toast.success('测试消息发送成功');
     } catch (error) {
-      toast.error('Failed to send test notification');
+      toast.error(`测试发送失败：${getErrorMessage(error)}`);
     } finally {
       setIsTesting(false);
     }
@@ -114,10 +126,10 @@ export default function NotificationPage() {
       const response = await notificationApi.upsertChannel({ ...channelToToggle, is_active: enabled });
       const updatedChannel = response && typeof response === 'object' ? response : { ...channelToToggle, is_active: enabled };
       setChannels(prev => prev.map(c => c.channel_type === updatedChannel.channel_type ? updatedChannel : c));
-      toast.success(`Channel ${enabled ? 'enabled' : 'disabled'}`);
+      toast.success(`${channelToToggle.name} 已${enabled ? '开启' : '关闭'}通知`);
     } catch (error) {
       setChannels(prev => prev.map(c => c.id === id ? { ...c, is_active: !enabled } : c));
-      toast.error('Failed to update channel status');
+      toast.error(`更新状态失败：${getErrorMessage(error)}`);
     }
   };
 

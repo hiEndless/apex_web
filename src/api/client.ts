@@ -1,4 +1,8 @@
+import { AUTH_TOKEN_STORAGE_KEY } from '@/constants/auth-token';
+
 export const API_BASE_URL = process.env.NEXT_PUBLIC_MY_API_BASE_URL || 'http://localhost:8888';
+
+export { AUTH_TOKEN_STORAGE_KEY };
 
 export interface BaseResponse<T> {
   code: number;
@@ -21,7 +25,8 @@ export class ApiError extends Error {
 }
 
 export const getHeaders = (skipAuth = false) => {
-  const token = typeof localStorage !== 'undefined' ? localStorage.getItem('jwt') : null;
+  const token =
+    typeof localStorage !== 'undefined' ? localStorage.getItem(AUTH_TOKEN_STORAGE_KEY) : null;
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
@@ -94,6 +99,15 @@ export const apiClient = {
   patch: async <T>(url: string, body: any, options: RequestOptions = {}): Promise<T> => {
     const response = await fetch(`${API_BASE_URL}${url}`, {
       method: 'PATCH',
+      headers: { ...getHeaders(options.skipAuth), ...options.headers },
+      body: JSON.stringify(body),
+    });
+    return handleResponse<T>(response);
+  },
+
+  put: async <T>(url: string, body: any, options: RequestOptions = {}): Promise<T> => {
+    const response = await fetch(`${API_BASE_URL}${url}`, {
+      method: 'PUT',
       headers: { ...getHeaders(options.skipAuth), ...options.headers },
       body: JSON.stringify(body),
     });

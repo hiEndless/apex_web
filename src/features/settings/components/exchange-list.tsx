@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   getCoreRowModel,
   useReactTable,
@@ -41,30 +41,32 @@ export function ExchangeList() {
   const [data, setData] = useState<ExchangeAccount[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const accounts = await settingsApi.getExchangeAccounts();
       setData(accounts);
-      const active = accounts.find((it) => it.is_active);
-      if (active?.exchange) {
-        setActiveExchangeToLocalStorage(active.exchange);
+      const active = accounts.find((it) => it.is_readonly && it.status === 1);
+      if (active?.platform) {
+        setActiveExchangeToLocalStorage(active.platform);
       } else {
         clearActiveExchangeFromLocalStorage();
       }
     } catch (error) {
       console.error('Failed to fetch exchange accounts:', error);
-      toast.error('Failed to fetch exchange accounts.');
+      toast.error(
+        error instanceof Error ? error.message : 'Failed to fetch exchange accounts.'
+      );
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
-  const columns = useMemo(() => getColumns(tColumns, fetchData), []);
+  const columns = useMemo(() => getColumns(tColumns, fetchData), [tColumns, fetchData]);
 
   const table = useReactTable({
     data,

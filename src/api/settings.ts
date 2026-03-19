@@ -2,28 +2,35 @@ import { apiClient } from './client';
 import {
   ExchangeAccount,
   ExchangeAccountCreate,
-  ExchangeAccountUpdate,
   ModelProvider,
   ModelProviderCreate,
   ModelProviderUpdate,
   SystemPreference,
 } from '@/features/settings/types';
 
+const EXCHANGE_ACCOUNTS_BASE = '/api/settings/exchange-accounts';
+
 export const settingsApi = {
-  getExchangeAccounts: () => {
-    return apiClient.get<ExchangeAccount[]>('/api/settings/exchange_accounts');
+  /** 合并交易员(只读)与跟单 API 列表 */
+  getExchangeAccounts: async () => {
+    const [trader, follower] = await Promise.all([
+      apiClient.get<ExchangeAccount[]>(`${EXCHANGE_ACCOUNTS_BASE}/trader`),
+      apiClient.get<ExchangeAccount[]>(`${EXCHANGE_ACCOUNTS_BASE}/follower`),
+    ]);
+    const merged = [...trader, ...follower];
+    merged.sort((a, b) => b.id - a.id);
+    return merged;
   },
 
   createExchangeAccount: (data: ExchangeAccountCreate) => {
-    return apiClient.post<ExchangeAccount>('/api/settings/exchange_accounts', data);
+    return apiClient.post<ExchangeAccount>(EXCHANGE_ACCOUNTS_BASE, {
+      ...data,
+      flag: data.flag ?? 0,
+    });
   },
 
-  updateExchangeAccount: (id: string, data: ExchangeAccountUpdate) => {
-    return apiClient.patch<ExchangeAccount>(`/api/settings/exchange_accounts/${id}`, data);
-  },
-
-  deleteExchangeAccount: (id: string) => {
-    return apiClient.delete<void>(`/api/settings/exchange_accounts/${id}`);
+  deleteExchangeAccount: (id: number) => {
+    return apiClient.delete<{ id: number }>(`${EXCHANGE_ACCOUNTS_BASE}/${id}`);
   },
 
   getModelProviders: () => {

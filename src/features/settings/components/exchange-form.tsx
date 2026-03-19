@@ -31,6 +31,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { ApiError } from '@/api/client';
 import { settingsApi } from '@/api/settings';
 import { toast } from 'sonner';
 import { Plus, Loader2 } from 'lucide-react';
@@ -44,8 +45,8 @@ const EXCHANGES = [
 const formSchema = z.object({
   exchange: z.string().min(1, 'Please select an exchange'),
   api_key: z.string().min(1, 'API Key is required'),
-  api_secret: z.string().optional(),
-  api_passphrase: z.string().optional(),
+  api_secret: z.string().min(1, 'Secret Key is required'),
+  api_passphrase: z.string().min(1, 'Passphrase is required'),
   api_label: z.string().optional(),
   is_read_only: z.boolean(),
 });
@@ -64,7 +65,7 @@ export function ExchangeAddButton({ onSuccess }: ExchangeAddButtonProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      exchange: 'binance',
+      exchange: 'okx',
       api_key: '',
       api_secret: '',
       api_passphrase: '',
@@ -76,21 +77,35 @@ export function ExchangeAddButton({ onSuccess }: ExchangeAddButtonProps) {
   const onSubmit = async (values: FormValues) => {
     setLoading(true);
     try {
+      const apiName = (values.api_label || '').trim() || values.exchange;
       await settingsApi.createExchangeAccount({
-        exchange: values.exchange,
+        platform: values.exchange,
+        is_readonly: values.is_read_only,
+        api_name: apiName,
+        passphrase: values.api_passphrase,
         api_key: values.api_key,
-        api_secret: values.api_secret || undefined,
-        api_passphrase: values.api_passphrase || undefined,
-        api_label: values.api_label || undefined,
-        is_read_only: values.is_read_only,
-        is_active: false,
+        secret_key: values.api_secret,
+        flag: 0,
       });
       toast.success('Exchange API added successfully');
       setOpen(false);
-      form.reset();
+      form.reset({
+        exchange: 'okx',
+        api_key: '',
+        api_secret: '',
+        api_passphrase: '',
+        api_label: '',
+        is_read_only: true
+      });
       onSuccess();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to add API');
+      const msg =
+        error instanceof ApiError
+          ? error.message
+          : error instanceof Error
+            ? error.message
+            : 'Failed to add API';
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
