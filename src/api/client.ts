@@ -29,6 +29,21 @@ export class ApiError extends Error {
   }
 }
 
+function normalizeRequestError(err: unknown): Error {
+  if (err instanceof ApiError) return err;
+  if (err instanceof TypeError) {
+    const message = err.message || '';
+    if (message.includes('Failed to fetch')) {
+      return new ApiError(
+        '网络请求失败，请检查后端服务是否可用，或确认浏览器跨域/插件拦截配置。',
+        0,
+      );
+    }
+  }
+  if (err instanceof Error) return err;
+  return new Error('Unknown request error');
+}
+
 export const getHeaders = (skipAuth = false) => {
   const token =
     typeof localStorage !== 'undefined' ? localStorage.getItem(AUTH_TOKEN_STORAGE_KEY) : null;
@@ -176,7 +191,8 @@ async function requestWithAutoRefresh<T>(
   try {
     const response = await fetch(`${API_BASE_URL}${url}`, fetchOptions);
     return handleResponse<T>(response);
-  } catch (err) {
+  } catch (rawErr) {
+    const err = normalizeRequestError(rawErr);
     if (!retry || skipAuth) throw err;
     if (!(err instanceof ApiError)) throw err;
     if (!AUTH_EXPIRE_CODE_SET.has(err.code ?? -1)) throw err;
