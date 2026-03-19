@@ -6,7 +6,14 @@ import { getSessionDisplay } from '@/lib/auth-session'
 
 /** 侧栏/顶栏展示：主行工作室名（无则平台），副行用户名 */
 export function useSessionDisplayUser() {
-  const [raw, setRaw] = useState(() => getSessionDisplay())
+  // Hydration mismatch fix:
+  // - SSR 阶段没有 window/localStorage，getSessionDisplay() 会返回 null 值
+  // - CSR hydration 时会读取到 localStorage，导致首屏文本不一致
+  // 这里先用两端一致的占位值，等 useEffect 后再同步真实 session。
+  const [raw, setRaw] = useState(() => ({
+    username: null,
+    studio_name: null
+  }))
 
   useEffect(() => {
     setRaw(getSessionDisplay())
