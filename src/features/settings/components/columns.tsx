@@ -19,7 +19,7 @@ const EXCHANGE_LOGO_SRC: Record<string, string> = {
   okx: '/exchange_logo/okx.png',
 };
 
-const ExchangeCell = ({ platform }: { platform: string }) => {
+export const ExchangeCell = ({ platform }: { platform: string }) => {
   const key = (platform || '').trim().toLowerCase();
   const logoSrc = EXCHANGE_LOGO_SRC[key];
 
@@ -39,7 +39,7 @@ const ExchangeCell = ({ platform }: { platform: string }) => {
   );
 };
 
-const DeleteCell = ({
+export const DeleteCell = ({
   row,
   onRefresh,
   t,
