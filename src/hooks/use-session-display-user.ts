@@ -10,9 +10,12 @@ export function useSessionDisplayUser() {
   // - SSR 阶段没有 window/localStorage，getSessionDisplay() 会返回 null 值
   // - CSR hydration 时会读取到 localStorage，导致首屏文本不一致
   // 这里先用两端一致的占位值，等 useEffect 后再同步真实 session。
-  const [raw, setRaw] = useState(() => ({
+  const [raw, setRaw] = useState<{
+    username: string | null
+    studio_name: string | null
+  }>(() => ({
     username: null,
-    studio_name: null
+    studio_name: null,
   }))
 
   useEffect(() => {

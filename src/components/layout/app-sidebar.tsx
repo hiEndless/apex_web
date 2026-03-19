@@ -40,7 +40,17 @@ import {
   IconUserCircle
 } from '@tabler/icons-react';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
-import { signOut } from '@/lib/auth-session';
+import {
+  persistAuthToken,
+  persistRefreshToken,
+  persistSessionDisplay,
+  signOut,
+} from '@/lib/auth-session';
+import { authApi } from '@/api/auth';
+import {
+  AUTH_REFRESH_TOKEN_STORAGE_KEY,
+  AUTH_TOKEN_STORAGE_KEY,
+} from '@/constants/auth-token';
 import * as React from 'react';
 import { Icons } from '../icons';
 import { ProductLogo } from './product-logo';
@@ -51,6 +61,80 @@ export default function AppSidebar() {
   const user = useSessionDisplayUser();
   const router = useRouter();
   const filteredItems = useFilteredNavItems(navItems);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    let timerId: number | null = null;
+    const refreshInFlightRef = { current: false };
+
+    function decodeJwtExp(accessToken: string): number | null {
+      try {
+        const parts = accessToken.split('.');
+        if (parts.length < 2) return null;
+        const payloadB64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+        const padding = '='.repeat((4 - (payloadB64.length % 4)) % 4);
+        const json = window.atob(payloadB64 + padding);
+        const payload = JSON.parse(json);
+        const exp = Number(payload?.exp);
+        return Number.isFinite(exp) ? exp : null;
+      } catch {
+        return null;
+      }
+    }
+
+    async function refreshOnce() {
+      if (cancelled) return;
+      if (refreshInFlightRef.current) return;
+      refreshInFlightRef.current = true;
+      try {
+        const refreshToken = localStorage.getItem(AUTH_REFRESH_TOKEN_STORAGE_KEY);
+        const accessToken = localStorage.getItem(AUTH_TOKEN_STORAGE_KEY);
+        if (!refreshToken || !accessToken) {
+          signOut(router);
+          return;
+        }
+
+        const data = await authApi.refresh({ refresh_token: refreshToken });
+        persistAuthToken(data.access_token);
+        persistRefreshToken(data.refresh_token);
+        persistSessionDisplay({
+          username: data.username,
+          studio_name: data.studio_name,
+        });
+      } catch {
+        signOut(router);
+      } finally {
+        refreshInFlightRef.current = false;
+      }
+    }
+
+    function scheduleNext() {
+      if (cancelled) return;
+      if (timerId) window.clearTimeout(timerId);
+
+      const accessToken = localStorage.getItem(AUTH_TOKEN_STORAGE_KEY);
+      const refreshToken = localStorage.getItem(AUTH_REFRESH_TOKEN_STORAGE_KEY);
+      if (!refreshToken) return;
+
+      const expSec = accessToken ? decodeJwtExp(accessToken) : null;
+      // 提前 60s 刷新；最小间隔 30s，避免抖动/死循环
+      const nowMs = Date.now();
+      const nextDelayMs = expSec
+        ? Math.max(30_000, expSec * 1000 - nowMs - 60_000)
+        : 5 * 60_000;
+
+      timerId = window.setTimeout(async () => {
+        await refreshOnce();
+        scheduleNext();
+      }, nextDelayMs);
+    }
+
+    scheduleNext();
+    return () => {
+      cancelled = true;
+      if (timerId) window.clearTimeout(timerId);
+    };
+  }, [router]);
 
   React.useEffect(() => {
     // Side effects based on sidebar state changes
