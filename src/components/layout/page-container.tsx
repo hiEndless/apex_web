@@ -51,8 +51,8 @@ export default function PageContainer({
   const content = isloading ? <PageSkeleton /> : children;
 
   return scrollable ? (
-    <ScrollArea className='h-[calc(100dvh-52px)]'>
-      <div className='flex flex-1 flex-col p-4 md:px-6'>
+    <ScrollArea className='h-[calc(100dvh-52px)] min-w-0'>
+      <div className='flex min-w-0 max-w-full flex-1 flex-col p-4 md:px-6'>
         <div className='mb-4 flex items-start justify-between'>
           <div>
             <Heading
