@@ -17,6 +17,7 @@ import { LineChart, Loader2, Plus, TrendingUp } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
 
 function MiniCurvePlaceholder() {
   return (
@@ -109,10 +110,10 @@ export default function CopyTaskPage() {
             return (
             <Card
               key={signal.id}
-              className='gap-2 rounded-xl border py-3 shadow-sm transition-shadow hover:shadow-md'
+              className='gap-2 rounded-xl border py-3 transition-shadow hover:shadow-md'
             >
               <CardHeader className='px-4 pb-1 pt-0'>
-                <div className='flex items-center gap-1.5'>
+                <div className='relative flex items-center gap-1.5 pr-16'>
                   {logoSrc ? (
                     <Image
                       src={logoSrc}
@@ -122,12 +123,21 @@ export default function CopyTaskPage() {
                       className='shrink-0'
                     />
                   ) : null}
-                  <CardTitle className='line-clamp-1 min-w-0 text-sm font-semibold leading-snug'>
-                    {signal.api_name || `信号 ${signal.id}`}
+                  <CardTitle className='min-w-0 text-sm font-semibold leading-snug'>
+                    <div className='line-clamp-1'>{signal.api_name || `信号 ${signal.id}`}</div>
                   </CardTitle>
+                  <Badge
+                    variant='default'
+                    className='absolute right-0 top-0 bg-blue-600 text-white border-transparent hover:bg-blue-600/90 text-xs'
+                  >
+                    自有
+                  </Badge>
                 </div>
               </CardHeader>
               <CardContent className='px-4 pt-0'>
+                <div className='mb-2 text-[10px] font-medium leading-none text-muted-foreground/80 tabular-nums'>
+                  当前资产：{signal.usdt.toFixed(2)} USDT
+                </div>
                 <div className='flex gap-2 rounded-lg border border-border/40 bg-muted/10 p-2'>
                   <div className='flex min-w-0 flex-1 flex-col justify-center gap-0.5'>
                     <p className='text-[10px] font-medium leading-none text-muted-foreground'>
