@@ -191,6 +191,7 @@ async function refreshAccessToken(): Promise<boolean> {
       persistSessionDisplay({
         username: data.username,
         studio_name: data.studio_name ?? null,
+        is_super_admin: data.is_super_admin,
       });
     }
     return true;

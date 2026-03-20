@@ -152,5 +152,10 @@
         "delete": "删除"
       }
     }
+  },
+  "StudioSwitcher": {
+    "label": "当前工作室",
+    "switching": "切换中…",
+    "loading": "加载中…"
   }
 }

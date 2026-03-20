@@ -35,6 +35,7 @@ const LoginForm = () => {
       persistSessionDisplay({
         username: data.username,
         studio_name: data.studio_name,
+        is_super_admin: data.is_super_admin,
       })
       router.push('/dashboard')
     } catch (err) {

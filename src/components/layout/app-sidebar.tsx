@@ -56,6 +56,7 @@ import { AUTH_REFRESH_TOKEN_STORAGE_KEY } from '@/constants/auth-token';
 import * as React from 'react';
 import { Icons } from '../icons';
 import { ProductLogo } from './product-logo';
+import { SidebarStudioSwitcher } from './sidebar-studio-switcher';
 
 export default function AppSidebar() {
   const pathname = usePathname();
@@ -93,6 +94,7 @@ export default function AppSidebar() {
         persistSessionDisplay({
           username: data.username,
           studio_name: data.studio_name,
+          is_super_admin: data.is_super_admin,
         });
         return 'ok';
       } catch (err) {
@@ -161,6 +163,7 @@ export default function AppSidebar() {
     <Sidebar collapsible='icon'>
       <SidebarHeader>
         <ProductLogo />
+        {user.canSwitchStudios ? <SidebarStudioSwitcher /> : null}
       </SidebarHeader>
       <SidebarContent className='overflow-x-hidden'>
         <SidebarGroup>

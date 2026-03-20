@@ -152,5 +152,10 @@
         "delete": "Delete"
       }
     }
+  },
+  "StudioSwitcher": {
+    "label": "Current studio",
+    "switching": "Switching…",
+    "loading": "Loading…"
   }
 }

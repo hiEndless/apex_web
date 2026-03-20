@@ -13,3 +13,5 @@ export const AUTH_TOKEN_COOKIE_MAX_AGE_SEC = 60 * 60 * 24 * 7
 /** 登录后展示用（非敏感），与 token 一并清理 */
 export const SESSION_USERNAME_KEY = 'apex_session_username'
 export const SESSION_STUDIO_NAME_KEY = 'apex_session_studio_name'
+/** 登录/续期写入，与 token 一并清理；对应后端 is_super_admin（root 能力） */
+export const SESSION_IS_SUPER_ADMIN_KEY = 'apex_session_is_super_admin'

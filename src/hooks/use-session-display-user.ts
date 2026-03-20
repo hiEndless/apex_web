@@ -13,29 +13,42 @@ export function useSessionDisplayUser() {
   const [raw, setRaw] = useState<{
     username: string | null
     studio_name: string | null
+    is_super_admin: boolean | null
   }>(() => ({
     username: null,
     studio_name: null,
+    is_super_admin: null,
   }))
 
   useEffect(() => {
-    setRaw(getSessionDisplay())
+    const sync = () => setRaw(getSessionDisplay())
+    sync()
+    window.addEventListener('apex-session-updated', sync)
+    return () => window.removeEventListener('apex-session-updated', sync)
   }, [])
 
   return useMemo(() => {
     const username = raw.username?.trim()
     const studioName = raw.studio_name?.trim()
+    const isSuperAdmin = raw.is_super_admin === true
+    const canSwitchStudios = username === 'root' || isSuperAdmin
     if (!username && !studioName) {
       return {
         fullName: '—',
         emailAddresses: [{ emailAddress: '—' }],
         imageUrl: '' as const,
+        isLoggedIn: false,
+        isSuperAdmin: false,
+        canSwitchStudios: false,
       }
     }
     return {
       fullName: studioName || '平台',
       emailAddresses: [{ emailAddress: username || '—' }],
       imageUrl: '' as const,
+      isLoggedIn: Boolean(username),
+      isSuperAdmin,
+      canSwitchStudios,
     }
   }, [raw])
 }
