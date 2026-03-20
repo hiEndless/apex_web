@@ -37,6 +37,9 @@ import { toast } from 'sonner';
 import { Plus, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+const EXCHANGE_IP_WHITELIST =
+  process.env.NEXT_PUBLIC_IP_WHITELIST ?? '0.0.0.0';
+
 const EXCHANGES = [
   { label: 'OKX', value: 'okx', logo: '/exchange_logo/okx.png' },
   // { label: 'Binance', value: 'binance', logo: '/exchange_logo/binance.png' },
@@ -123,6 +126,17 @@ export function ExchangeAddButton({ onSuccess }: ExchangeAddButtonProps) {
         <DialogHeader>
           <DialogTitle>{t('dialog.title')}</DialogTitle>
           <DialogDescription>{t('dialog.description')}</DialogDescription>
+          <div
+            className="mt-3 flex gap-2 rounded-lg border-0 bg-amber-50 px-3 py-2 text-xs text-foreground/90 dark:bg-amber-950/25 dark:text-amber-50/95"
+            role="note"
+          >
+            <span className="shrink-0 select-none text-sm leading-snug" aria-hidden>
+              💡
+            </span>
+            <p className="min-w-0 leading-relaxed">
+              {t('dialog.ipWhitelistNote', { ip: EXCHANGE_IP_WHITELIST })}
+            </p>
+          </div>
         </DialogHeader>
         <Form form={form} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField

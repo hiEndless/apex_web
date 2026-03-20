@@ -78,7 +78,8 @@
       "addButton": "添加交易所 API",
       "dialog": {
         "title": "添加交易所 API",
-        "description": "在此处输入您的交易所 API 凭据。"
+        "description": "在此处输入您的交易所 API 凭据。",
+        "ipWhitelistNote": "添加交易 API 时，请将 {ip} 加入 IP 白名单；仅添加只读 API 可忽略此条。"
       },
       "form": {
         "exchange": "交易所",

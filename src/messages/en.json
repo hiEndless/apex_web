@@ -78,7 +78,8 @@
       "addButton": "Add Exchange API",
       "dialog": {
         "title": "Add Exchange API",
-        "description": "Enter your exchange API credentials here."
+        "description": "Enter your exchange API credentials here.",
+        "ipWhitelistNote": "For trading APIs, add {ip} to the IP whitelist. You can ignore this when adding read-only APIs only."
       },
       "form": {
         "exchange": "Exchange",
