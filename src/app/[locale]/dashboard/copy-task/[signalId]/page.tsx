@@ -232,6 +232,17 @@ export default function SignalDetailPage() {
     return new Date(ms).toLocaleString();
   };
 
+  const formatOpenTimeShort = (cTime?: string) => {
+    const ms = Number(cTime ?? '');
+    if (!Number.isFinite(ms)) return '-';
+    return new Date(ms).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    });
+  };
+
   const formatUpl = (upl?: string) => {
     const n = parseFloat(upl ?? '');
     if (!Number.isFinite(n)) return '-';
@@ -400,18 +411,20 @@ export default function SignalDetailPage() {
     pos_side?: string | null;
     quantity: number;
     status: number;
-    trace_id?: string | null;
-    trader_order_id?: string | null;
-    follower_order_id?: string | null;
+    s_code?: string | null;
+    reason?: string | null;
   }) => {
     const posZh = formatPosSide(log.pos_side);
     const posText = posZh === '-' ? '持仓' : `${posZh}单`;
     const base = `${actionZhByFollower(log.action)} ${log.inst_id} ${posText} ${formatQty(log.quantity)} 个`;
     if (log.status === 2) {
-      const err = String(log.trace_id ?? log.trader_order_id ?? log.follower_order_id ?? '')
-        .trim()
-        .slice(0, 120);
-      return err ? `${base}，失败原因：${err}` : `${base}，跟单失败`;
+      const reason = String(log.reason ?? '').trim().slice(0, 200);
+      const code = String(log.s_code ?? '').trim();
+      const lines: string[] = [];
+      if (reason) lines.push(`失败原因：${reason}`);
+      if (code) lines.push(`错误码：${code}`);
+      if (lines.length === 0) return base;
+      return `${base}\n${lines.join('\n')}`;
     }
     return base;
   };
@@ -482,9 +495,8 @@ export default function SignalDetailPage() {
             pos_side?: string | null;
             quantity: number;
             status: number;
-            trace_id?: string | null;
-            trader_order_id?: string | null;
-            follower_order_id?: string | null;
+            s_code?: string | null;
+            reason?: string | null;
             created_at?: string | null;
           }>
         >(
@@ -697,56 +709,115 @@ export default function SignalDetailPage() {
                 当前空仓
               </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>交易对</TableHead>
-                    <TableHead>方向</TableHead>
-                    <TableHead>仓位</TableHead>
-                    <TableHead>开仓价</TableHead>
-                    <TableHead>标记价</TableHead>
-                    <TableHead>保证金</TableHead>
-                    <TableHead>收益</TableHead>
-                    <TableHead>收益率</TableHead>
-                    <TableHead>开仓时间</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              <>
+                <div className='space-y-2 md:hidden'>
                   {signalPositions.map((item) => (
-                    <TableRow
+                    <div
                       key={`${item.instId ?? ''}-${item.posSide ?? ''}-${item.pos ?? ''}`}
+                      className='rounded-lg border p-2'
                     >
-                      <TableCell>
-                        <div className='flex items-center gap-2'>
-                          <span>{item.instId ?? '-'}</span>
-                          {getLeverBadgeText(item.lever) ? (
-                            <Badge
-                              variant='secondary'
-                              className='h-5 px-2 text-[11px] leading-4 border-transparent bg-blue-50 text-blue-700 hover:bg-blue-50/90'
-                            >
-                              {getLeverBadgeText(item.lever)}
-                            </Badge>
-                          ) : null}
-                        </div>
-                      </TableCell>
-                      <TableCell className={getDirectionInfo(item).className}>
-                        {getDirectionInfo(item).label}
-                      </TableCell>
-                      <TableCell>{formatAbsPos(item.pos)}</TableCell>
-                      <TableCell>{item.avgPx ?? '-'}</TableCell>
-                      <TableCell>{item.markPx ?? '-'}</TableCell>
-                      <TableCell>{formatMargin(item.margin)}</TableCell>
-                      <TableCell className={getUplClass(item.upl)}>
-                        {formatUpl(item.upl)}
-                      </TableCell>
-                      <TableCell className={getUplRatioClass(item.uplRatio)}>
-                        {formatUplRatioPercent(item.uplRatio)}
-                      </TableCell>
-                      <TableCell>{formatOpenTime(item.cTime)}</TableCell>
-                    </TableRow>
+                      <div className='flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px]'>
+                        <span className='font-medium tabular-nums'>
+                          {item.instId ?? '-'}
+                        </span>
+                        {getLeverBadgeText(item.lever) ? (
+                          <Badge
+                            variant='secondary'
+                            className='h-4 px-2 text-[11px] leading-4 border-transparent bg-blue-50 text-blue-700 hover:bg-blue-50/90'
+                          >
+                            {getLeverBadgeText(item.lever)}
+                          </Badge>
+                        ) : null}
+
+                        <span className='text-muted-foreground'>方向</span>
+                        <span className={`font-medium ${getDirectionInfo(item).className}`}>
+                          {getDirectionInfo(item).label}
+                        </span>
+
+                        <span className='text-muted-foreground'>仓位</span>
+                        <span className='tabular-nums'>{formatAbsPos(item.pos)}</span>
+
+                        <span className='text-muted-foreground'>开仓价</span>
+                        <span className='tabular-nums'>{item.avgPx ?? '-'}</span>
+
+                        <span className='text-muted-foreground'>标记</span>
+                        <span className='tabular-nums'>{item.markPx ?? '-'}</span>
+
+                        <span className='text-muted-foreground'>保证金</span>
+                        <span className='tabular-nums'>{formatMargin(item.margin)}</span>
+
+                        <span className='text-muted-foreground'>收益</span>
+                        <span className={`tabular-nums ${getUplClass(item.upl)}`}>
+                          {formatUpl(item.upl)}
+                        </span>
+
+                        <span className='text-muted-foreground'>收益率</span>
+                        <span className={`tabular-nums ${getUplRatioClass(item.uplRatio)}`}>
+                          {formatUplRatioPercent(item.uplRatio)}
+                        </span>
+
+                        <span className='text-muted-foreground'>时间</span>
+                        <span className='tabular-nums text-muted-foreground'>
+                          {formatOpenTimeShort(item.cTime)}
+                        </span>
+                      </div>
+                    </div>
                   ))}
-                </TableBody>
-              </Table>
+                </div>
+
+                <div className='hidden md:block'>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>交易对</TableHead>
+                        <TableHead>方向</TableHead>
+                        <TableHead>仓位</TableHead>
+                        <TableHead>开仓价</TableHead>
+                        <TableHead>标记价</TableHead>
+                        <TableHead>保证金</TableHead>
+                        <TableHead>收益</TableHead>
+                        <TableHead>收益率</TableHead>
+                        <TableHead>开仓时间</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {signalPositions.map((item) => (
+                        <TableRow
+                          key={`${item.instId ?? ''}-${item.posSide ?? ''}-${item.pos ?? ''}`}
+                        >
+                          <TableCell>
+                            <div className='flex items-center gap-2'>
+                              <span>{item.instId ?? '-'}</span>
+                              {getLeverBadgeText(item.lever) ? (
+                                <Badge
+                                  variant='secondary'
+                                  className='h-5 px-2 text-[11px] leading-4 border-transparent bg-blue-50 text-blue-700 hover:bg-blue-50/90'
+                                >
+                                  {getLeverBadgeText(item.lever)}
+                                </Badge>
+                              ) : null}
+                            </div>
+                          </TableCell>
+                          <TableCell className={getDirectionInfo(item).className}>
+                            {getDirectionInfo(item).label}
+                          </TableCell>
+                          <TableCell>{formatAbsPos(item.pos)}</TableCell>
+                          <TableCell>{item.avgPx ?? '-'}</TableCell>
+                          <TableCell>{item.markPx ?? '-'}</TableCell>
+                          <TableCell>{formatMargin(item.margin)}</TableCell>
+                          <TableCell className={getUplClass(item.upl)}>
+                            {formatUpl(item.upl)}
+                          </TableCell>
+                          <TableCell className={getUplRatioClass(item.uplRatio)}>
+                            {formatUplRatioPercent(item.uplRatio)}
+                          </TableCell>
+                          <TableCell>{formatOpenTime(item.cTime)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>
@@ -849,13 +920,13 @@ export default function SignalDetailPage() {
                           <span className='absolute left-0 top-2 h-2 w-2 rounded-full bg-primary/80' />
                           <span className='absolute left-[3px] top-4 h-[calc(100%-10px)] w-px bg-border/70' />
                           <div className='space-y-1 pb-2'>
-                            <div className='text-xs leading-5 text-foreground/90 break-words'>
+                            <div className='text-xs leading-5 text-foreground/90 break-words whitespace-pre-line'>
                               {blankLeft ? '-' : trade.text}
                               <span className='ml-2 text-[11px] text-muted-foreground'>
                                 {blankLeft ? '-' : trade.time}
                               </span>
                             </div>
-                            <div className='text-xs leading-5 text-foreground/90 break-words'>
+                            <div className='text-xs leading-5 text-foreground/90 break-words whitespace-pre-line'>
                               <span className='text-[11px] text-muted-foreground mr-2'>
                                 {rightItem?.time || '-'}
                               </span>
@@ -875,7 +946,7 @@ export default function SignalDetailPage() {
                       return (
                         <div key={trade.id} className='contents'>
                           <div className='flex items-center justify-end gap-2 py-1.5 pr-2 text-right'>
-                            <div className='text-xs leading-5 text-foreground/90 break-words'>
+                            <div className='text-xs leading-5 text-foreground/90 break-words whitespace-pre-line'>
                               {blankLeft ? '-' : trade.text}
                             </div>
                             <div className='shrink-0 text-[11px] leading-4 text-muted-foreground'>
@@ -889,7 +960,7 @@ export default function SignalDetailPage() {
                             <div className='shrink-0 text-[11px] leading-4 text-muted-foreground'>
                               {rightItem?.time || '-'}
                             </div>
-                            <div className='text-xs leading-5 text-foreground/90 break-words'>
+                            <div className='text-xs leading-5 text-foreground/90 break-words whitespace-pre-line'>
                               {rightItem?.text || '暂无该笔跟单日志'}
                             </div>
                           </div>
