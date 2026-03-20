@@ -65,7 +65,7 @@ export default function CopyTaskPage() {
   return (
     <PageContainer
       pageTitle='跟单管理'
-      pageDescription='选择只读信号 API，进入详情配置跟单策略'
+      pageDescription='选择信号，进入详情配置跟单策略'
       // pageHeaderAction={
       //   <Button
       //     size='sm'
