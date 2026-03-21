@@ -44,6 +44,7 @@ import {
 } from '@/components/ui/table';
 import { EXCHANGE_LOGO_SRC } from '@/constants/exchange-logo';
 import { ExchangeAccount } from '@/features/settings/types';
+import { getSessionDisplay } from '@/lib/auth-session';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
@@ -103,6 +104,17 @@ function buildDefaultConfig(enabled: boolean): FollowConfig {
   };
 }
 
+/** 绑定返回的 follower_api_id 可能已删或不在当前工作室列表；若仍优先使用会无匹配高亮 */
+function pickDefaultTradingApiId(
+  tradingApis: ExchangeAccount[],
+  preferred: number | null
+): number | null {
+  if (tradingApis.length === 0) return null;
+  const ids = new Set(tradingApis.map((a) => a.id));
+  if (preferred != null && ids.has(preferred)) return preferred;
+  return tradingApis[0]?.id ?? null;
+}
+
 export default function SignalDetailPage() {
   const params = useParams<{ signalId: string }>();
   const signalId = Number(params.signalId);
@@ -123,10 +135,16 @@ export default function SignalDetailPage() {
   );
 
   useEffect(() => {
+    setSelectedApiId(null);
+    setSheetOpen(false);
+  }, [signalId]);
+
+  useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const data = await settingsApi.getExchangeAccounts();
+        const includeTeamStudios = getSessionDisplay().is_team_manager === true;
+        const data = await settingsApi.getExchangeAccounts({ includeTeamStudios });
         setAccounts(data);
       } catch (error) {
         const message =
@@ -195,14 +213,21 @@ export default function SignalDetailPage() {
 
         setConfigByApiId(initConfigs);
 
-        const firstFollowed = Array.from(nextFollowedApiIds.values())[0] ?? null;
-        setSelectedTimelineApiId(firstFollowed);
+        if (nextFollowedApiIds.size === 0) {
+          setSelectedTimelineApiId(null);
+        } else {
+          const firstValid = Array.from(nextFollowedApiIds.values()).find((id) =>
+            tradingApis.some((a) => a.id === id)
+          );
+          setSelectedTimelineApiId(firstValid ?? tradingApis[0]?.id ?? null);
+        }
       } catch (error) {
         if (cancelled) return;
         const message =
           error instanceof Error ? error.message : '加载跟单绑定失败，请稍后重试';
         toast.error(message);
         setFollowedApiIds(new Set());
+        setSelectedTimelineApiId(null);
       }
     };
 
@@ -833,8 +858,9 @@ export default function SignalDetailPage() {
               </div>
               <Button
                 onClick={() => {
-                  const defaultApiId = selectedTimelineApiId ?? tradingApis[0]?.id ?? null;
-                  setSelectedApiId(defaultApiId);
+                  setSelectedApiId(
+                    pickDefaultTradingApiId(tradingApis, selectedTimelineApiId)
+                  );
                   setSheetOpen(true);
                 }}
               >

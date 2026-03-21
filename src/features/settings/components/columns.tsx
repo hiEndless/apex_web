@@ -57,8 +57,12 @@ export const DeleteCell = ({
       }
       toast.success(t('deleteSuccess'));
       onRefresh();
-    } catch {
-      toast.error(t('deleteFailed'));
+    } catch (error) {
+      const msg =
+        error instanceof Error && error.message.trim() !== ''
+          ? error.message
+          : t('deleteFailed');
+      toast.error(msg);
     } finally {
       setLoading(false);
       setShowConfirm(false);

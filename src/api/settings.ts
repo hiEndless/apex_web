@@ -11,10 +11,12 @@ import {
 const EXCHANGE_ACCOUNTS_BASE = '/api/settings/exchange-accounts';
 
 export const settingsApi = {
-  /** 合并交易员(只读)与跟单 API 列表 */
-  getExchangeAccounts: async () => {
+  /** 合并交易员(只读)与跟单 API 列表；团队管理员可传 includeTeamStudios 聚合名下工作室只读 API */
+  getExchangeAccounts: async (options?: { includeTeamStudios?: boolean }) => {
+    const qs =
+      options?.includeTeamStudios === true ? '?include_team_studios=true' : '';
     const [trader, follower] = await Promise.all([
-      apiClient.get<ExchangeAccount[]>(`${EXCHANGE_ACCOUNTS_BASE}/trader`),
+      apiClient.get<ExchangeAccount[]>(`${EXCHANGE_ACCOUNTS_BASE}/trader${qs}`),
       apiClient.get<ExchangeAccount[]>(`${EXCHANGE_ACCOUNTS_BASE}/follower`),
     ]);
     const merged = [...trader, ...follower];

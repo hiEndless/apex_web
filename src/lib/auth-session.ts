@@ -6,6 +6,7 @@ import {
   AUTH_TOKEN_STORAGE_KEY,
   AUTH_REFRESH_TOKEN_STORAGE_KEY,
   SESSION_IS_SUPER_ADMIN_KEY,
+  SESSION_IS_TEAM_MANAGER_KEY,
   SESSION_STUDIO_NAME_KEY,
   SESSION_USERNAME_KEY,
 } from '@/constants/auth-token'
@@ -29,6 +30,7 @@ export function clearAuthToken() {
   localStorage.removeItem(SESSION_USERNAME_KEY)
   localStorage.removeItem(SESSION_STUDIO_NAME_KEY)
   localStorage.removeItem(SESSION_IS_SUPER_ADMIN_KEY)
+  localStorage.removeItem(SESSION_IS_TEAM_MANAGER_KEY)
   const secure = window.location.protocol === 'https:' ? '; Secure' : ''
   document.cookie = `${AUTH_TOKEN_COOKIE_NAME}=; Path=/; Max-Age=0; SameSite=Lax${secure}`
 }
@@ -37,6 +39,7 @@ export function persistSessionDisplay(payload: {
   username: string
   studio_name: string | null
   is_super_admin?: boolean
+  is_team_manager?: boolean
 }) {
   if (typeof window === 'undefined') return
   localStorage.setItem(SESSION_USERNAME_KEY, payload.username)
@@ -50,6 +53,11 @@ export function persistSessionDisplay(payload: {
   } else if (payload.is_super_admin === false) {
     localStorage.setItem(SESSION_IS_SUPER_ADMIN_KEY, '0')
   }
+  if (payload.is_team_manager === true) {
+    localStorage.setItem(SESSION_IS_TEAM_MANAGER_KEY, '1')
+  } else if (payload.is_team_manager === false) {
+    localStorage.setItem(SESSION_IS_TEAM_MANAGER_KEY, '0')
+  }
   window.dispatchEvent(new Event('apex-session-updated'))
 }
 
@@ -57,15 +65,23 @@ export function getSessionDisplay(): {
   username: string | null
   studio_name: string | null
   is_super_admin: boolean | null
+  is_team_manager: boolean | null
 } {
   if (typeof window === 'undefined') {
-    return { username: null, studio_name: null, is_super_admin: null }
+    return {
+      username: null,
+      studio_name: null,
+      is_super_admin: null,
+      is_team_manager: null,
+    }
   }
   const sa = localStorage.getItem(SESSION_IS_SUPER_ADMIN_KEY)
+  const tm = localStorage.getItem(SESSION_IS_TEAM_MANAGER_KEY)
   return {
     username: localStorage.getItem(SESSION_USERNAME_KEY),
     studio_name: localStorage.getItem(SESSION_STUDIO_NAME_KEY),
     is_super_admin: sa === '1' ? true : sa === '0' ? false : null,
+    is_team_manager: tm === '1' ? true : tm === '0' ? false : null,
   }
 }
 

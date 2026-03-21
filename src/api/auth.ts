@@ -16,6 +16,7 @@ export interface LoginResult {
   studio_code: string | null;
   studio_name: string | null;
   is_super_admin: boolean;
+  is_team_manager: boolean;
 }
 
 export interface RegisterPayload {
@@ -53,6 +54,7 @@ export interface SwitchStudioResult {
   studio_id: number;
   studio_code: string;
   studio_name: string;
+  is_team_manager: boolean;
 }
 
 const AUTH_OPTIONS = { skipAuth: true as const };

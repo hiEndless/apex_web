@@ -1,5 +1,6 @@
 'use client';
 
+import { authApi, type StudioListItem } from '@/api/auth';
 import { settingsApi } from '@/api/settings';
 import PageContainer from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
@@ -10,8 +11,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { getAccessTokenStudioId } from '@/api/client';
 import { EXCHANGE_LOGO_SRC } from '@/constants/exchange-logo';
 import { ExchangeAccount } from '@/features/settings/types';
+import { getSessionDisplay } from '@/lib/auth-session';
 import { useRouter } from '@/i18n/navigation';
 import { LineChart, Loader2, Plus, TrendingUp } from 'lucide-react';
 import Image from 'next/image';
@@ -39,13 +42,27 @@ export default function CopyTaskPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [accounts, setAccounts] = useState<ExchangeAccount[]>([]);
+  const [studioNamesById, setStudioNamesById] = useState<Record<number, string>>({});
 
   useEffect(() => {
     const fetchAccounts = async () => {
       setLoading(true);
       try {
-        const data = await settingsApi.getExchangeAccounts();
+        const includeTeamStudios = getSessionDisplay().is_team_manager === true;
+        const [data, studios] = await Promise.all([
+          settingsApi.getExchangeAccounts({ includeTeamStudios }),
+          includeTeamStudios ? authApi.listStudios() : Promise.resolve<StudioListItem[]>([]),
+        ]);
         setAccounts(data);
+        if (includeTeamStudios && studios.length > 0) {
+          const map: Record<number, string> = {};
+          for (const s of studios) {
+            map[s.studio_id] = s.studio_name;
+          }
+          setStudioNamesById(map);
+        } else {
+          setStudioNamesById({});
+        }
       } catch (error) {
         const message =
           error instanceof Error ? error.message : '加载信号列表失败，请稍后重试';
@@ -61,6 +78,8 @@ export default function CopyTaskPage() {
     () => accounts.filter((item) => item.is_readonly),
     [accounts]
   );
+
+  const currentStudioId = getAccessTokenStudioId();
 
   return (
     <PageContainer
@@ -107,6 +126,10 @@ export default function CopyTaskPage() {
           {signalApis.map((signal) => {
             const platformKey = (signal.platform || '').trim().toLowerCase();
             const logoSrc = EXCHANGE_LOGO_SRC[platformKey];
+            const isOwnSignal =
+              currentStudioId == null || signal.studio_id === currentStudioId;
+            const otherStudioLabel =
+              studioNamesById[signal.studio_id] ?? `工作室 #${signal.studio_id}`;
             return (
             <Card
               key={signal.id}
@@ -126,12 +149,22 @@ export default function CopyTaskPage() {
                   <CardTitle className='min-w-0 text-sm font-semibold leading-snug'>
                     <div className='line-clamp-1'>{signal.api_name || `信号 ${signal.id}`}</div>
                   </CardTitle>
-                  <Badge
-                    variant='default'
-                    className='absolute right-0 top-0 bg-blue-600 text-white border-transparent hover:bg-blue-600/90 text-xs'
-                  >
-                    自有
-                  </Badge>
+                  {isOwnSignal ? (
+                    <Badge
+                      variant='default'
+                      className='absolute right-0 top-0 max-w-[min(10rem,40%)] border-transparent bg-blue-600 text-xs text-white hover:bg-blue-600/90'
+                    >
+                      自有
+                    </Badge>
+                  ) : (
+                    <Badge
+                      variant='default'
+                      title={otherStudioLabel}
+                      className='absolute right-0 top-0 max-w-[min(10rem,40%)] border-transparent bg-green-600 text-xs text-white hover:bg-green-600/90'
+                    >
+                      <span className='line-clamp-1'>{otherStudioLabel}</span>
+                    </Badge>
+                  )}
                 </div>
               </CardHeader>
               <CardContent className='px-4 pt-0'>

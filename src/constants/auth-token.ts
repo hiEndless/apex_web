@@ -15,3 +15,5 @@ export const SESSION_USERNAME_KEY = 'apex_session_username'
 export const SESSION_STUDIO_NAME_KEY = 'apex_session_studio_name'
 /** 登录/续期写入，与 token 一并清理；对应后端 is_super_admin（root 能力） */
 export const SESSION_IS_SUPER_ADMIN_KEY = 'apex_session_is_super_admin'
+/** 对应后端 is_team_manager，可切换团队下工作室 */
+export const SESSION_IS_TEAM_MANAGER_KEY = 'apex_session_is_team_manager'

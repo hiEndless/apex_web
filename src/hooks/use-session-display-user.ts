@@ -14,10 +14,12 @@ export function useSessionDisplayUser() {
     username: string | null
     studio_name: string | null
     is_super_admin: boolean | null
+    is_team_manager: boolean | null
   }>(() => ({
     username: null,
     studio_name: null,
     is_super_admin: null,
+    is_team_manager: null,
   }))
 
   useEffect(() => {
@@ -31,7 +33,9 @@ export function useSessionDisplayUser() {
     const username = raw.username?.trim()
     const studioName = raw.studio_name?.trim()
     const isSuperAdmin = raw.is_super_admin === true
-    const canSwitchStudios = username === 'root' || isSuperAdmin
+    const isTeamManager = raw.is_team_manager === true
+    const canSwitchStudios =
+      username === 'root' || isSuperAdmin || isTeamManager
     if (!username && !studioName) {
       return {
         fullName: '—',

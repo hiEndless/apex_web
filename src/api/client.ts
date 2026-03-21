@@ -131,19 +131,35 @@ export const AUTH_EXPIRE_RETRY_CODES = new Set<number>([2002, 2003, 2004, 2005])
 /** 距 access JWT 过期不足该毫秒数时，发业务请求前先刷新 */
 const PROACTIVE_REFRESH_LEAD_MS = 120_000;
 
-function decodeJwtExpMs(accessToken: string): number | null {
+function decodeJwtPayload(accessToken: string): Record<string, unknown> | null {
   try {
     const parts = accessToken.split('.');
     if (parts.length < 2) return null;
     const payloadB64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
     const padding = '='.repeat((4 - (payloadB64.length % 4)) % 4);
     const json = window.atob(payloadB64 + padding);
-    const payload = JSON.parse(json);
-    const expSec = Number(payload?.exp);
-    return Number.isFinite(expSec) ? expSec * 1000 : null;
+    return JSON.parse(json) as Record<string, unknown>;
   } catch {
     return null;
   }
+}
+
+function decodeJwtExpMs(accessToken: string): number | null {
+  const payload = decodeJwtPayload(accessToken);
+  if (!payload) return null;
+  const expSec = Number(payload.exp);
+  return Number.isFinite(expSec) ? expSec * 1000 : null;
+}
+
+/** 当前 access token 中的工作室 ID（无法解析则 null） */
+export function getAccessTokenStudioId(): number | null {
+  if (typeof window === 'undefined') return null;
+  const accessToken = localStorage.getItem(AUTH_TOKEN_STORAGE_KEY);
+  if (!accessToken) return null;
+  const payload = decodeJwtPayload(accessToken);
+  if (!payload) return null;
+  const sid = Number(payload.studio_id);
+  return Number.isFinite(sid) && sid > 0 ? sid : null;
 }
 
 /** 当前 localStorage 中 access token 的过期时刻（ms），无法解析则 null */
@@ -192,6 +208,7 @@ async function refreshAccessToken(): Promise<boolean> {
         username: data.username,
         studio_name: data.studio_name ?? null,
         is_super_admin: data.is_super_admin,
+        is_team_manager: data.is_team_manager,
       });
     }
     return true;

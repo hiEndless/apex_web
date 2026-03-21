@@ -36,6 +36,7 @@ const LoginForm = () => {
         username: data.username,
         studio_name: data.studio_name,
         is_super_admin: data.is_super_admin,
+        is_team_manager: data.is_team_manager,
       })
       router.push('/dashboard')
     } catch (err) {

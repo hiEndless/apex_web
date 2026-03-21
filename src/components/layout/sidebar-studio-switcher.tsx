@@ -61,6 +61,7 @@ export function SidebarStudioSwitcher() {
         persistSessionDisplay({
           username: data.username,
           studio_name: data.studio_name,
+          is_team_manager: data.is_team_manager,
           ...(prev.is_super_admin != null
             ? { is_super_admin: prev.is_super_admin }
             : {}),
