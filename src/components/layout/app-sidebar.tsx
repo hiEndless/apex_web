@@ -26,7 +26,8 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarRail
+  SidebarRail,
+  useSidebar
 } from '@/components/ui/sidebar';
 import { UserAvatarProfile } from '@/components/user-avatar-profile';
 import { navItems } from '@/config/nav-config';
@@ -61,6 +62,7 @@ import { SidebarStudioSwitcher } from './sidebar-studio-switcher';
 export default function AppSidebar() {
   const pathname = usePathname();
   const { isOpen } = useMediaQuery();
+  const { state: sidebarState, isMobile } = useSidebar();
   const user = useSessionDisplayUser();
   const router = useRouter();
   const filteredItems = useFilteredNavItems(navItems);
@@ -164,7 +166,10 @@ export default function AppSidebar() {
     <Sidebar collapsible='icon'>
       <SidebarHeader>
         <ProductLogo />
-        {user.canSwitchStudios ? <SidebarStudioSwitcher /> : null}
+        {user.canSwitchStudios &&
+        (isMobile || sidebarState === 'expanded') ? (
+          <SidebarStudioSwitcher />
+        ) : null}
       </SidebarHeader>
       <SidebarContent className='overflow-x-hidden'>
         <SidebarGroup>
