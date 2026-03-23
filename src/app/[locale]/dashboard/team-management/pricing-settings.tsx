@@ -19,7 +19,7 @@ const PLAN_CONFIGS: PlanConfig[] = [
   { code: 'vip', name: 'VIP', defaultPrice: '' },
   { code: 'vip_plus', name: 'VIP Plus', defaultPrice: '' },
   { code: 'vip_pro', name: 'VIP Pro', defaultPrice: '' },
-  { code: 'team_manager_upgrade', name: 'Team Manager Upgrade', defaultPrice: '' },
+  { code: 'team_manager_upgrade', name: '团队管理权限', defaultPrice: '' },
 ];
 
 type TeamPrice = {
