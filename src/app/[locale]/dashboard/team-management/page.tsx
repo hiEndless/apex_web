@@ -48,35 +48,12 @@ export default function ExclusivePage() {
 
   const tabs = [
     {
-      name: '概况',
+      name: '设置',
       value: 'settings',
       content: (
         <div className="space-y-4">
           {/* 第一行：工作室当前等级、分成比例和资产数据 */}
-          <div className="flex flex-wrap items-center gap-3 text-xs">
-            <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-primary">
-              <span className="font-semibold">当前等级:</span>
-              <span>{profile?.level_name || '普通工作室'}</span>
-            </div>
-            <div className="flex items-center gap-1.5 rounded-full bg-green-500/10 px-3 py-1 text-green-600">
-              <span className="font-semibold">分成比例:</span>
-              <span>{profile ? formatPercentage(profile.commission_rate) : '0%'}</span>
-            </div>
-            
-            {/* 资产数据标签 */}
-            <div className="flex items-center gap-1.5 rounded-full bg-red-500/10 px-3 py-1 text-red-500">
-              <span className="font-semibold text-muted-foreground">累计分成:</span>
-              <span className="font-bold">{summary?.total_commission || '0.0000'} <span className="text-[10px] font-normal">USDT</span></span>
-            </div>
-            <div className="flex items-center gap-1.5 rounded-full bg-green-500/10 px-3 py-1 text-green-600">
-              <span className="font-semibold text-muted-foreground">已提现:</span>
-              <span className="font-bold">{summary?.withdrawn_commission || '0.0000'} <span className="text-[10px] font-normal">USDT</span></span>
-            </div>
-            <div className="flex items-center gap-1.5 rounded-full bg-amber-500/10 px-3 py-1 text-amber-500">
-              <span className="font-semibold text-muted-foreground">未提现:</span>
-              <span className="font-bold">{summary?.pending_commission || '0.0000'} <span className="text-[10px] font-normal">USDT</span></span>
-            </div>
-          </div>
+          
 
           <PricingSettings />
         </div>
@@ -135,6 +112,31 @@ export default function ExclusivePage() {
               <span className='font-semibold'>{organization?.name}</span>!
               管理你的工作室团队
             </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 text-xs">
+            <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-primary">
+              <span className="font-semibold">当前等级:</span>
+              <span>{profile?.level_name || '普通工作室'}</span>
+            </div>
+            <div className="flex items-center gap-1.5 rounded-full bg-green-500/10 px-3 py-1 text-green-600">
+              <span className="font-semibold">分成比例:</span>
+              <span>{profile ? formatPercentage(profile.commission_rate) : '0%'}</span>
+            </div>
+            
+            {/* 资产数据标签 */}
+            <div className="flex items-center gap-1.5 rounded-full bg-red-500/10 px-3 py-1 text-red-500">
+              <span className="font-semibold text-muted-foreground">累计分成:</span>
+              <span className="font-bold">{summary?.total_commission || '0.0000'} <span className="text-[10px] font-normal">USDT</span></span>
+            </div>
+            <div className="flex items-center gap-1.5 rounded-full bg-green-500/10 px-3 py-1 text-green-600">
+              <span className="font-semibold text-muted-foreground">已提现:</span>
+              <span className="font-bold">{summary?.withdrawn_commission || '0.0000'} <span className="text-[10px] font-normal">USDT</span></span>
+            </div>
+            <div className="flex items-center gap-1.5 rounded-full bg-amber-500/10 px-3 py-1 text-amber-500">
+              <span className="font-semibold text-muted-foreground">未提现:</span>
+              <span className="font-bold">{summary?.pending_commission || '0.0000'} <span className="text-[10px] font-normal">USDT</span></span>
+            </div>
           </div>
           
           <Tabs defaultValue="settings" className="gap-6 flex flex-col">
