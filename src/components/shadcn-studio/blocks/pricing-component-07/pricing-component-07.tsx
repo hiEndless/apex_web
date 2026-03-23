@@ -247,6 +247,8 @@ const Pricing = ({ plans }: { plans: Plan[] }) => {
         open={payDialogOpen}
         onOpenChange={setPayDialogOpen}
         amountUsdt={paymentAmountUsdt}
+        planId={selectedPlanData.id}
+        billingCycle={billing}
       />
     </section>
   )

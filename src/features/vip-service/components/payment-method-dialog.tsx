@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 import Image from 'next/image'
-import { Copy, X } from 'lucide-react'
+import { Copy, X, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
@@ -18,6 +18,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { EXCHANGE_LOGO_SRC } from '@/constants/exchange-logo'
 import { cn } from '@/lib/utils'
+import { apiClient } from '@/api/client'
 
 const EXCHANGE_ACCOUNTS: Record<'binance' | 'okx', string> = {
   binance: '727380886',
@@ -31,15 +32,20 @@ export interface PaymentMethodDialogProps {
   onOpenChange: (open: boolean) => void
   /** 应付 USDT 数量（与定价区一致） */
   amountUsdt: number
+  planId: string
+  billingCycle: 'month' | 'year'
 }
 
 export function PaymentMethodDialog({
   open,
   onOpenChange,
-  amountUsdt
+  amountUsdt,
+  planId,
+  billingCycle
 }: PaymentMethodDialogProps) {
   const [exchange, setExchange] = useState<PaymentExchange>('binance')
   const [referenceId, setReferenceId] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
   const account = EXCHANGE_ACCOUNTS[exchange]
   const exchangeLabel = exchange === 'binance' ? 'Binance' : 'OKX'
@@ -54,15 +60,42 @@ export function PaymentMethodDialog({
     }
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const ref = referenceId.trim()
     if (!ref) {
       toast.error('请输入参考编号')
       return
     }
-    toast.success('已提交，请等待验证')
-    onOpenChange(false)
-    setReferenceId('')
+
+    try {
+      setSubmitting(true)
+      const payType = exchange === 'binance' ? 1 : 2
+
+      if (planId === 'team') {
+        await apiClient.post('/api/order/team-manager-upgrade/pay', {
+          pay_type: payType,
+          order_price: amountUsdt.toString(),
+          fromWdId: ref
+        })
+      } else {
+        await apiClient.post('/api/order/pay', {
+          plan_code: planId,
+          pay_type: payType,
+          order_price: amountUsdt.toString(),
+          fromWdId: ref,
+          period_unit: billingCycle,
+          period_count: 1
+        })
+      }
+
+      toast.success('提交成功，转账金额已确认！')
+      onOpenChange(false)
+      setReferenceId('')
+    } catch (err: any) {
+      toast.error(err.message || '提交失败')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -162,11 +195,12 @@ export function PaymentMethodDialog({
 
         <DialogFooter className='border-border bg-background gap-2 border-t px-4 py-3 sm:justify-end'>
           <DialogClose asChild>
-            <Button type='button' variant='outline' size='sm'>
+            <Button type='button' variant='outline' size='sm' disabled={submitting}>
               关闭
             </Button>
           </DialogClose>
-          <Button type='button' size='sm' onClick={handleSubmit}>
+          <Button type='button' size='sm' onClick={handleSubmit} disabled={submitting}>
+            {submitting && <Loader2 className='mr-2 size-4 animate-spin' />}
             提交验证
           </Button>
         </DialogFooter>
