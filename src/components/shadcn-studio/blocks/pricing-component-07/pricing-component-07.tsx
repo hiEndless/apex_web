@@ -25,14 +25,24 @@ export type Plan = {
   buttonText: string
 }
 
-const YEARLY_DISCOUNT = 0.8
+function parseYearlyDiscountRate(raw?: string): number {
+  const parsed = Number(raw)
+  if (!Number.isFinite(parsed)) return 1
+  if (parsed <= 0 || parsed > 1) return 1
+  return parsed
+}
+
+const YEARLY_DISCOUNT_RATE = parseYearlyDiscountRate(
+  process.env.NEXT_PUBLIC_MEMBERSHIP_YEARLY_DISCOUNT_RATE
+)
+const YEARLY_DISCOUNT_PERCENT = Math.max(0, Math.round((1 - YEARLY_DISCOUNT_RATE) * 100))
 
 function formatYuan(amount: number) {
   return `${amount} USDT`
 }
 
 function yearlyTotal(monthly: number) {
-  return Math.round(monthly * 12 * YEARLY_DISCOUNT)
+  return Math.round(monthly * 12 * YEARLY_DISCOUNT_RATE)
 }
 
 /** 年付划线价：按原价计全年（不打折） */
@@ -101,12 +111,14 @@ const Pricing = ({ plans }: { plans: Plan[] }) => {
               年付
             </button>
           </div>
-          <div className='flex items-center gap-1.5'>
-            <span className='text-muted-foreground text-[11px]'>年付享</span>
-            <span className='inline-flex items-center rounded-full bg-emerald-50 px-2 py-px text-[11px] font-medium text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200'>
-              🏷️ 优惠 20%
-            </span>
-          </div>
+          {YEARLY_DISCOUNT_PERCENT > 0 && (
+            <div className='flex items-center gap-1.5'>
+              <span className='text-muted-foreground text-[11px]'>年付享</span>
+              <span className='inline-flex items-center rounded-full bg-emerald-50 px-2 py-px text-[11px] font-medium text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200'>
+                优惠 {YEARLY_DISCOUNT_PERCENT}%
+              </span>
+            </div>
+          )}
         </div>
 
         <div className='flex flex-col gap-4 lg:flex-row lg:items-stretch'>
