@@ -173,7 +173,7 @@ export default function AppSidebar() {
       </SidebarHeader>
       <SidebarContent className='overflow-x-hidden'>
         <SidebarGroup>
-          <SidebarGroupLabel>Overview</SidebarGroupLabel>
+          {/*<SidebarGroupLabel>Overview</SidebarGroupLabel>*/}
           <SidebarMenu>
             {filteredItems.map((item) => {
               const Icon = item.icon ? Icons[item.icon] : Icons.logo;
@@ -274,7 +274,7 @@ export default function AppSidebar() {
                     onClick={() => router.push('/dashboard/profile')}
                   >
                     <IconUserCircle className='mr-2 h-4 w-4' />
-                    Profile
+                    账号设置
                   </DropdownMenuItem>
                   {/*{organization && (*/}
                   {/*  <DropdownMenuItem*/}
@@ -293,7 +293,7 @@ export default function AppSidebar() {
                 
                 <DropdownMenuItem onClick={() => signOut(router)}>
                   <IconLogout className='mr-2 h-4 w-4' />
-                  Log out
+                  退出登录
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

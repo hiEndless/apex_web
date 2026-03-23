@@ -101,6 +101,12 @@ export const navItems: NavItem[] = [
         icon: 'profile',
         shortcut: ['n', 'n']
       },
+      {
+        title: '账号设置',
+        url: '/dashboard/profile',
+        icon: 'profile',
+        shortcut: ['p', 'p']
+      },
     ]
   }
 ];
