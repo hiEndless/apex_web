@@ -23,7 +23,7 @@ export function useFilteredNavItems(items: NavItem[]) {
     }
     
     // Check if the item requires super admin access
-    if (item.access?.requireSuperAdmin && !user.is_super_admin) {
+    if (item.access?.requireSuperAdmin && user.isSuperAdmin !== true) {
       return false;
     }
 
