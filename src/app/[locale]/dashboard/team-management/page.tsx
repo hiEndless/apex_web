@@ -116,8 +116,8 @@ export default function ExclusivePage() {
 
           <div className="flex flex-wrap items-center gap-3 text-xs">
             <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-primary">
-              <span className="font-semibold">当前等级:</span>
-              <span>{profile?.level_name || '普通工作室'}</span>
+              {/* <span className="font-semibold">当前等级:</span> */}
+              <span className="font-semibold">{profile?.level_name || 'Level 1'}</span>
             </div>
             <div className="flex items-center gap-1.5 rounded-full bg-green-500/10 px-3 py-1 text-green-600">
               <span className="font-semibold">分成比例:</span>
