@@ -85,11 +85,12 @@ export const navItems: NavItem[] = [
   },
   {
     title: '团队管理',
-    url: '/dashboard/team-management', // Placeholder as there is no direct link for the parent
+    url: '/dashboard/team-management', 
     icon: 'userGroup',
     isActive: true,
     shortcut: ['t', 't'],
-    items: []
+    items: [],
+    access: { requireTeamManager: true }
   },
   {
     title: '设置',

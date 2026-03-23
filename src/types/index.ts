@@ -6,6 +6,8 @@ export interface PermissionCheck {
   feature?: string;
   role?: string;
   requireOrg?: boolean;
+  requireTeamManager?: boolean;
+  requireSuperAdmin?: boolean;
 }
 
 export interface NavItem {
