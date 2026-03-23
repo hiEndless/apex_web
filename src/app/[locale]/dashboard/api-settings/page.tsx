@@ -11,7 +11,7 @@ export default function ApiSettingsPage() {
     <PageContainer>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">API 设置</h1>
+          <h1 className="text-2xl font-bold tracking-tight">API 设置</h1>
           <p className="text-muted-foreground">
             添加和管理工作室交易员与跟单 API
           </p>

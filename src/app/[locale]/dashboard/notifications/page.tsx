@@ -147,7 +147,7 @@ export default function NotificationPage() {
     <PageContainer>
       <div className="space-y-6 h-full flex flex-col">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">通知设置</h1>
+          <h1 className="text-2xl font-bold tracking-tight">通知设置</h1>
           <p className="text-muted-foreground">
             配置您的消息通知方式与触发规则
           </p>
