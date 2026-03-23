@@ -3,11 +3,11 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
-import { apiClient } from '@/api/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { teamManagementApi } from '@/api/team-management';
 
 type PlanConfig = {
   code: string;
@@ -22,11 +22,6 @@ const PLAN_CONFIGS: PlanConfig[] = [
   { code: 'team_manager_upgrade', name: '团队管理权限', defaultPrice: '' },
 ];
 
-type TeamPrice = {
-  plan_code: string;
-  month_price: string;
-};
-
 export function PricingSettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
@@ -38,7 +33,7 @@ export function PricingSettings() {
 
   const fetchPrices = async () => {
     try {
-      const res = await apiClient.get<TeamPrice[]>('/api/settings/memberships/pricing/team-overrides');
+      const res = await teamManagementApi.getTeamOverrides();
       const newPrices: Record<string, string> = {};
       if (Array.isArray(res)) {
         res.forEach(item => {
@@ -66,9 +61,7 @@ export function PricingSettings() {
 
     setSaving(code);
     try {
-      await apiClient.put(`/api/settings/memberships/pricing/team-overrides/${code}`, {
-        month_price: price
-      });
+      await teamManagementApi.updateTeamOverride(code, price);
       toast.success('价格设置已保存');
     } catch (error) {
       toast.error('保存失败，请重试');

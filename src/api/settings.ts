@@ -58,4 +58,7 @@ export const settingsApi = {
   upsertSystemPreference: (data: { key: string; value: any }) => {
     return apiClient.post<SystemPreference>('/api/settings/system_preferences', data);
   },
+
+  getEffectivePricing: () =>
+    apiClient.get<{ items: any[] }>('/api/settings/memberships/pricing/effective'),
 };

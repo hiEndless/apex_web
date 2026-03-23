@@ -8,7 +8,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { apiClient } from '@/api/client';
+import { authApi } from '@/api/auth';
 
 export default function ProfileViewPage() {
   const [studioName, setStudioName] = useState('');
@@ -26,9 +26,7 @@ export default function ProfileViewPage() {
     }
     try {
       setUpdatingStudio(true);
-      await apiClient.post('/api/auth/studio/update-name', {
-        studio_name: studioName.trim()
-      });
+      await authApi.updateStudioName(studioName.trim());
       toast.success('工作室名称修改成功');
       setStudioName('');
     } catch (err: any) {
@@ -57,7 +55,7 @@ export default function ProfileViewPage() {
     }
     try {
       setUpdatingPassword(true);
-      await apiClient.post('/api/auth/change-password', {
+      await authApi.changePassword({
         current_password: currentPassword,
         new_password: newPassword,
         revoke_sessions: true

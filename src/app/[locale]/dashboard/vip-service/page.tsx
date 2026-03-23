@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 
 import PageContainer from '@/components/layout/page-container';
 import Pricing, { type Plan } from '@/components/shadcn-studio/blocks/pricing-component-07/pricing-component-07';
-import { apiClient } from '@/api/client';
+import { settingsApi } from '@/api/settings';
 import { Loader2 } from 'lucide-react';
 
 const defaultPlans: Plan[] = [
@@ -55,7 +55,7 @@ export default function VipServicePage() {
   useEffect(() => {
     const fetchPrices = async () => {
       try {
-        const res = await apiClient.get<{ items: any[] }>('/api/settings/memberships/pricing/effective');
+        const res = await settingsApi.getEffectivePricing();
         const items = res?.items || [];
         
         // Merge fetched prices into defaultPlans

@@ -13,23 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BadgeCheck, Wallet, HandCoins, PiggyBank, Settings2 } from 'lucide-react';
 import { getSessionDisplay } from '@/lib/auth-session';
 import { PricingSettings } from './pricing-settings';
-import { apiClient } from '@/api/client';
-
-type ManagerLevelProfile = {
-  team_manager_user_id: number;
-  level_id: number | null;
-  level_code: string | null;
-  level_name: string | null;
-  commission_rate: string;
-  effective_at: string | null;
-};
-
-type CommissionSummary = {
-  team_manager_user_id: number;
-  total_commission: string;
-  withdrawn_commission: string;
-  pending_commission: string;
-};
+import { teamManagementApi, type ManagerLevelProfile, type CommissionSummary } from '@/api/team-management';
 
 export default function ExclusivePage() {
   const [organization, setOrganization] = useState<{ name: string | null }>({ name: '' });
@@ -44,8 +28,8 @@ export default function ExclusivePage() {
     const fetchData = async () => {
       try {
         const [profileRes, summaryRes] = await Promise.all([
-          apiClient.get<ManagerLevelProfile>('/api/team-management/manager-level-profile'),
-          apiClient.get<CommissionSummary>('/api/settings/memberships/revenue/team-commission-summary')
+          teamManagementApi.getManagerLevelProfile(),
+          teamManagementApi.getCommissionSummary()
         ]);
         setProfile(profileRes);
         setSummary(summaryRes);

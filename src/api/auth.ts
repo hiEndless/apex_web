@@ -73,4 +73,14 @@ export const authApi = {
 
   switchStudio: (payload: { studio_code: string }) =>
     apiClient.post<SwitchStudioResult>('/api/auth/switch-studio', payload),
+
+  updateStudioName: async (studioName: string) => {
+    return apiClient.post('/api/auth/studio/update-name', {
+      studio_name: studioName
+    });
+  },
+
+  changePassword: async (data: Record<string, any>) => {
+    return apiClient.post('/api/auth/change-password', data);
+  }
 };
