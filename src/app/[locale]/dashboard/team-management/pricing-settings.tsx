@@ -85,7 +85,7 @@ export function PricingSettings() {
       <CardHeader>
         <CardTitle>套餐价格设置</CardTitle>
         <CardDescription>
-          设置您的下级工作室可见的各会员套餐及升级价格。如果不设置，将使用平台默认价格。
+          设置下级工作室可见的各会员套餐及升级价格。如果不设置，将使用平台默认价格。
         </CardDescription>
       </CardHeader>
       <CardContent>
