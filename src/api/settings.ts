@@ -10,6 +10,12 @@ import {
 
 const EXCHANGE_ACCOUNTS_BASE = '/api/settings/exchange-accounts';
 
+export type EffectivePricingResponse = {
+  studio_id: number;
+  items: any[];
+  team_manager_upgrade_price: string;
+};
+
 export const settingsApi = {
   /** 合并交易员(只读)与跟单 API 列表；团队管理员可传 includeTeamStudios 聚合名下工作室只读 API */
   getExchangeAccounts: async (options?: { includeTeamStudios?: boolean }) => {
@@ -60,5 +66,5 @@ export const settingsApi = {
   },
 
   getEffectivePricing: () =>
-    apiClient.get<{ items: any[] }>('/api/settings/memberships/pricing/effective'),
+    apiClient.get<EffectivePricingResponse>('/api/settings/memberships/pricing/effective'),
 };

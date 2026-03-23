@@ -57,10 +57,17 @@ export default function VipServicePage() {
       try {
         const res = await settingsApi.getEffectivePricing();
         const items = res?.items || [];
+        const upgradePrice = res?.team_manager_upgrade_price;
         
         // Merge fetched prices into defaultPlans
         const updatedPlans = defaultPlans.map(plan => {
           if (plan.id === 'team') {
+            if (upgradePrice) {
+              return {
+                ...plan,
+                oneTimePrice: Number(upgradePrice)
+              };
+            }
             return plan;
           }
           const serverPlan = items.find(item => item.plan_code === plan.id);
