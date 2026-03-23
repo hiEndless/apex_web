@@ -12,6 +12,11 @@ export function useFilteredNavItems(items: NavItem[]) {
   const user = useSessionDisplayUser();
 
   const filterItem = (item: NavItem): boolean => {
+    // Only check if user object is fully loaded/hydrated
+    if (user.isLoggedIn === undefined || user.is_team_manager === null) {
+      return false; // Safely hide items until auth state is resolved
+    }
+
     // Check if the item requires team manager access
     if (item.access?.requireTeamManager && !user.is_team_manager) {
       return false;

@@ -15,12 +15,12 @@ export function useSessionDisplayUser() {
     studio_name: string | null
     is_super_admin: boolean | null
     is_team_manager: boolean | null
-  }>(() => ({
+  }>({
     username: null,
     studio_name: null,
     is_super_admin: null,
     is_team_manager: null,
-  }))
+  })
 
   useEffect(() => {
     const sync = () => setRaw(getSessionDisplay())
@@ -36,6 +36,21 @@ export function useSessionDisplayUser() {
     const isTeamManager = raw.is_team_manager === true
     const canSwitchStudios =
       username === 'root' || isSuperAdmin || isTeamManager
+      
+    // If username is null, it means we either haven't hydrated yet, or the user is not logged in.
+    // In our app, a logged in user will always have a username in localStorage.
+    if (raw.username === null) {
+      return {
+        fullName: '—',
+        emailAddresses: [{ emailAddress: '—' }],
+        imageUrl: '' as const,
+        isLoggedIn: undefined, // undefined indicates loading/hydrating state
+        isSuperAdmin: null,
+        is_team_manager: null, // explicit null indicates loading/hydrating state
+        canSwitchStudios: false,
+      }
+    }
+    
     if (!username && !studioName) {
       return {
         fullName: '—',
@@ -43,6 +58,7 @@ export function useSessionDisplayUser() {
         imageUrl: '' as const,
         isLoggedIn: false,
         isSuperAdmin: false,
+        is_team_manager: false,
         canSwitchStudios: false,
       }
     }
@@ -52,6 +68,7 @@ export function useSessionDisplayUser() {
       imageUrl: '' as const,
       isLoggedIn: Boolean(username),
       isSuperAdmin,
+      is_team_manager: isTeamManager, // expose exactly as is_team_manager for the guard
       canSwitchStudios,
     }
   }, [raw])
