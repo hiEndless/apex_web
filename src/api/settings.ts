@@ -16,6 +16,15 @@ export type EffectivePricingResponse = {
   team_manager_upgrade_price: string;
 };
 
+export type CurrentMembershipResponse = {
+  studio_id: number;
+  plan_code: string;
+  plan_name: string;
+  source: string;
+  subscription_id: string | null;
+  subscription_end_at: string | null;
+};
+
 export const settingsApi = {
   /** 合并交易员(只读)与跟单 API 列表；团队管理员可传 includeTeamStudios 聚合名下工作室只读 API */
   getExchangeAccounts: async (options?: { includeTeamStudios?: boolean }) => {
@@ -67,4 +76,7 @@ export const settingsApi = {
 
   getEffectivePricing: () =>
     apiClient.get<EffectivePricingResponse>('/api/settings/memberships/pricing/effective'),
+
+  getCurrentMembership: () =>
+    apiClient.get<CurrentMembershipResponse>('/api/settings/memberships/current'),
 };

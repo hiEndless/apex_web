@@ -157,5 +157,9 @@
     "label": "Current studio",
     "switching": "Switching…",
     "loading": "Loading…"
+  },
+  "Membership": {
+    "expired": "Expired",
+    "remainingDays": "{days} days left"
   }
 }

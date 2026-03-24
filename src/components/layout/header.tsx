@@ -8,6 +8,7 @@ import { ModeToggle } from './ThemeToggle/theme-toggle';
 import CtaGithub from './cta-github';
 
 import LanguageSwitcher from './LanguageSwitcher';
+import { MembershipDisplay } from './membership-display';
 
 export default function Header() {
   return (
@@ -18,14 +19,17 @@ export default function Header() {
         <Breadcrumbs />
       </div>
 
-      <div className='flex items-center gap-2 px-4'>
-        {/*<CtaGithub />*/}
-        {/* <div className='hidden md:flex'>
-          <SearchInput />
-        </div> */}
-        <ModeToggle />
-        <LanguageSwitcher />
-        {/* <UserNav /> */}
+      <div className='flex items-center gap-4 px-4'>
+        <MembershipDisplay />
+        <div className='flex items-center gap-2'>
+          {/*<CtaGithub />*/}
+          {/* <div className='hidden md:flex'>
+            <SearchInput />
+          </div> */}
+          <ModeToggle />
+          <LanguageSwitcher />
+          {/* <UserNav /> */}
+        </div>
       </div>
     </header>
   );

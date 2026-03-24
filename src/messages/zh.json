@@ -157,5 +157,9 @@
     "label": "当前工作室",
     "switching": "切换中…",
     "loading": "加载中…"
+  },
+  "Membership": {
+    "expired": "已过期",
+    "remainingDays": "剩余 {days} 天"
   }
 }
