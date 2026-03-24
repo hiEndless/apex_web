@@ -234,7 +234,7 @@ export default function PositionsHistoryPage() {
       pageTitle='交易员历史持仓'
       pageDescription='历史平仓记录'
     >
-      <div className='min-w-0 max-w-full space-y-4'>
+      <div className='w-full min-w-0 max-w-full space-y-4'>
       <div className='mb-4 flex flex-wrap items-center gap-2'>
         <Link
           href='/dashboard/copy-task'
@@ -245,14 +245,14 @@ export default function PositionsHistoryPage() {
         </Link>
       </div>
 
-      <Card className='mb-4 min-w-0 gap-0 border py-4 shadow-none'>
+      <Card className='mb-4 min-w-0 gap-0 overflow-hidden border py-4 shadow-none'>
         <CardHeader className='px-3 pb-2 pt-0 sm:px-4'>
           <CardTitle className='text-sm font-medium'>筛选</CardTitle>
         </CardHeader>
-        <CardContent className='min-w-0 px-3 pt-0 sm:px-4'>
+        <CardContent className='w-full min-w-0 max-w-full overflow-x-auto px-3 pt-0 sm:px-4'>
           <div className='flex flex-col gap-3'>
             {/* 第一行：基础筛选 */}
-            <div className='grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4'>
+            <div className='grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4'>
             <div className='space-y-1'>
               <div className='text-xs text-muted-foreground'>信号</div>
               <Select
@@ -332,12 +332,14 @@ export default function PositionsHistoryPage() {
             </div>
 
             {/* 第二行：与第一行同宽的四列网格，开仓/平仓与「信号」列宽一致 */}
-            <div className='grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4'>
+            <div className='grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4'>
               <div className='min-w-0 space-y-1'>
                 <div className='text-xs text-muted-foreground'>开仓时间</div>
                 <DateTimeRangePicker
                   valueStart={filters.cTimeStart}
                   valueEnd={filters.cTimeEnd}
+                  className='w-full min-w-0'
+                  triggerClassName='w-full min-w-0 max-w-full'
                   onChange={(startMs, endMs) =>
                     setFilters((prev) => ({ ...prev, cTimeStart: startMs, cTimeEnd: endMs }))
                   }
@@ -349,6 +351,8 @@ export default function PositionsHistoryPage() {
                 <DateTimeRangePicker
                   valueStart={filters.uTimeStart}
                   valueEnd={filters.uTimeEnd}
+                  className='w-full min-w-0'
+                  triggerClassName='w-full min-w-0 max-w-full'
                   onChange={(startMs, endMs) =>
                     setFilters((prev) => ({ ...prev, uTimeStart: startMs, uTimeEnd: endMs }))
                   }
@@ -380,7 +384,7 @@ export default function PositionsHistoryPage() {
                   <Button
                     variant='default'
                     size='sm'
-                    className='h-8 text-xs'
+                    className='h-8 text-xs shadow-none'
                     onClick={() => {
                       void fetchRecords();
                     }}
@@ -390,7 +394,7 @@ export default function PositionsHistoryPage() {
                   <Button
                     variant='outline'
                     size='sm'
-                    className='h-8 text-xs'
+                    className='h-8 text-xs shadow-none'
                     onClick={() => {
                       const nextFilters: FilterState = {
                         apiId: '',
@@ -431,7 +435,7 @@ export default function PositionsHistoryPage() {
         </CardContent>
       </Card>
 
-      <Card className='min-w-0'>
+      <Card className='min-w-0 overflow-hidden'>
         <CardHeader className='px-3 sm:px-6'>
           <div className='flex items-center justify-between gap-3'>
             <div>
@@ -446,7 +450,7 @@ export default function PositionsHistoryPage() {
             ) : null}
           </div>
         </CardHeader>
-        <CardContent className='min-w-0 p-0 sm:px-6 sm:pb-6'>
+        <CardContent className='w-full min-w-0 overflow-visible p-0 sm:px-6 sm:pb-6'>
           {error ? (
             <div className='m-3 sm:m-0 rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground'>
               {error}
@@ -456,9 +460,9 @@ export default function PositionsHistoryPage() {
               暂无历史持仓
             </div>
           ) : (
-            <div className='relative w-full max-w-[100vw] sm:max-w-full overflow-hidden'>
-              <div className='overflow-x-auto pb-4 px-3 sm:px-0'>
-                <Table className='w-full min-w-[1100px]'>
+            <div className='relative w-full min-w-0 max-w-full overflow-hidden'>
+              <div className='w-full min-w-0 max-w-full touch-pan-x overflow-auto overscroll-x-contain px-3 pb-4 sm:px-0'>
+                <Table className='w-full min-w-[900px] whitespace-nowrap lg:min-w-[1100px]'>
                   <TableHeader>
                     <TableRow>
                     <TableHead>信号ID</TableHead>
@@ -517,11 +521,11 @@ export default function PositionsHistoryPage() {
             </div>
           )}
           {!loading && !error && records.length > 0 ? (
-            <div className='mt-4 flex min-w-0 flex-wrap items-center justify-between gap-3 border-t pt-4 px-3 sm:px-0 text-sm text-muted-foreground'>
+            <div className='mt-4 flex min-w-0 flex-wrap items-center justify-between gap-3 border-t px-3 pt-4 text-sm text-muted-foreground sm:px-0'>
               <span>
                 共 {records.length} 条，每页 {PAGE_SIZE} 条
               </span>
-              <div className='flex items-center gap-2'>
+              <div className='flex min-w-0 flex-wrap items-center gap-2'>
                 <Button
                   type='button'
                   variant='outline'
