@@ -84,7 +84,7 @@ export function SignalGridView({
                 {isOwnSignal ? (
                   <Badge
                     variant='default'
-                    className='absolute right-0 top-0 max-w-[min(10rem,40%)] border-transparent bg-blue-600 text-xs text-white hover:bg-blue-600/90'
+                    className='absolute right-0 top-0 max-w-[min(10rem,40%)] border-transparent bg-blue-600 text-xs text-white shadow-none hover:bg-blue-600/90'
                   >
                     自有
                   </Badge>
@@ -92,7 +92,7 @@ export function SignalGridView({
                   <Badge
                     variant='default'
                     title={otherStudioLabel}
-                    className='absolute right-0 top-0 max-w-[min(10rem,40%)] border-transparent bg-green-600 text-xs text-white hover:bg-green-600/90'
+                    className='absolute right-0 top-0 max-w-[min(10rem,40%)] border-transparent bg-green-600 text-xs text-white shadow-none hover:bg-green-600/90'
                   >
                     <span className='line-clamp-1'>{otherStudioLabel}</span>
                   </Badge>
