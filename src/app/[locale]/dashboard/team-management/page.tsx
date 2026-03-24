@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BadgeCheck, Wallet, HandCoins, PiggyBank, Settings2 } from 'lucide-react';
 import { getSessionDisplay } from '@/lib/auth-session';
 import { PricingSettings } from './pricing-settings';
+import { InviteCodeDisplay } from './invite-code-display';
 import { teamManagementApi, type ManagerLevelProfile, type CommissionSummary } from '@/api/team-management';
 
 export default function ExclusivePage() {
@@ -52,9 +53,7 @@ export default function ExclusivePage() {
       value: 'settings',
       content: (
         <div className="space-y-4">
-          {/* 第一行：工作室当前等级、分成比例和资产数据 */}
-          
-
+          <InviteCodeDisplay />
           <PricingSettings />
         </div>
       )

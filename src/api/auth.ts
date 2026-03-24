@@ -82,5 +82,9 @@ export const authApi = {
 
   changePassword: async (data: Record<string, any>) => {
     return apiClient.post('/api/auth/change-password', data);
+  },
+
+  getTeamInviteCode: async () => {
+    return apiClient.get<{ user_id: number; is_team_manager: boolean; team_invite_code: string }>('/api/auth/team-invite-code');
   }
 };
