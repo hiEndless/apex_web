@@ -104,6 +104,16 @@ function buildDefaultConfig(enabled: boolean): FollowConfig {
   };
 }
 
+function isValidFollowRatio(value?: string): boolean {
+  const raw = String(value ?? '').trim();
+  return /^[1-9]\d*$/.test(raw);
+}
+
+function formatFollowRatioForInput(value: number): string {
+  if (!Number.isFinite(value)) return '';
+  return Number.isInteger(value) ? String(value) : String(value).replace(/\.?0+$/, '');
+}
+
 /** 绑定返回的 follower_api_id 可能已删或不在当前工作室列表；若仍优先使用会无匹配高亮 */
 function pickDefaultTradingApiId(
   tradingApis: ExchangeAccount[],
@@ -195,7 +205,7 @@ export default function SignalDetailPage() {
             continue;
           }
           const ratioStr = Number.isFinite(binding.ratio)
-            ? binding.ratio.toFixed(2)
+            ? formatFollowRatioForInput(binding.ratio)
             : String(binding.ratio);
           initConfigs[api.id] = {
             enabled: true,
@@ -580,11 +590,11 @@ export default function SignalDetailPage() {
     const trader_api_id = signal.id;
     const follower_api_id = selectedApiId;
 
-    const ratioNum = parseFloat(config.ratio ?? '');
-    if (!Number.isFinite(ratioNum)) {
-      toast.error('跟单比例必须是数字');
+    if (!isValidFollowRatio(config.ratio)) {
+      toast.error('跟单比例必须是大于等于 1 的正整数');
       return;
     }
+    const ratioNum = Number.parseInt(String(config.ratio).trim(), 10);
 
     if (config.lever_set === 2) {
       const leverageNum = parseFloat(config.leverage ?? '');
@@ -641,7 +651,7 @@ export default function SignalDetailPage() {
           continue;
         }
         const ratioStr = Number.isFinite(binding.ratio)
-          ? binding.ratio.toFixed(2)
+          ? formatFollowRatioForInput(binding.ratio)
           : String(binding.ratio);
         initConfigs[api.id] = {
           enabled: true,
@@ -1096,8 +1106,13 @@ export default function SignalDetailPage() {
                   <label className='text-xs font-medium'>跟单比例</label>
                   <Input
                     value={configByApiId[selectedApi.id]?.ratio ?? ''}
-                    onChange={(e) => updateSelectedConfig({ ratio: e.target.value })}
-                    placeholder='例如 1.00'
+                    onChange={(e) => {
+                      const nextValue = e.target.value;
+                      if (/^\d*$/.test(nextValue)) {
+                        updateSelectedConfig({ ratio: nextValue });
+                      }
+                    }}
+                    placeholder='例如 1'
                   />
                 </div>
 

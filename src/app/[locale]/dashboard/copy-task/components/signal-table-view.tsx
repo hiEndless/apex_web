@@ -47,7 +47,7 @@ export function SignalTableView({
             <TableHead className="w-[300px] whitespace-nowrap">信号源 / 跟单账户</TableHead>
             <TableHead className="whitespace-nowrap">工作室</TableHead>
             <TableHead className="whitespace-nowrap">当前资产</TableHead>
-            <TableHead className="whitespace-nowrap">跟单倍数</TableHead>
+            <TableHead className="whitespace-nowrap">跟单比例</TableHead>
             <TableHead className="whitespace-nowrap text-right">操作</TableHead>
           </TableRow>
         </TableHeader>
