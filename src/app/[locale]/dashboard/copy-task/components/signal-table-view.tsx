@@ -40,14 +40,15 @@ export function SignalTableView({
 
   return (
     <div className="rounded-md border bg-card">
-      <Table>
+      <div className="w-full overflow-x-auto overscroll-x-contain">
+        <Table className="min-w-[760px]">
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[300px]">信号源 / 跟单账户</TableHead>
-            <TableHead>工作室</TableHead>
-            <TableHead>当前资产</TableHead>
-            <TableHead>跟单倍数</TableHead>
-            <TableHead className="text-right">操作</TableHead>
+            <TableHead className="w-[300px] whitespace-nowrap">信号源 / 跟单账户</TableHead>
+            <TableHead className="whitespace-nowrap">工作室</TableHead>
+            <TableHead className="whitespace-nowrap">当前资产</TableHead>
+            <TableHead className="whitespace-nowrap">跟单倍数</TableHead>
+            <TableHead className="whitespace-nowrap text-right">操作</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -71,7 +72,7 @@ export function SignalTableView({
             return (
               <Fragment key={signal.id}>
                 <TableRow className="bg-muted/30 hover:bg-muted/50">
-                  <TableCell className="font-medium">
+                  <TableCell className="font-medium whitespace-nowrap">
                     <div className="flex items-center gap-2">
                       <button 
                         onClick={() => toggleRow(signal.id)}
@@ -85,18 +86,18 @@ export function SignalTableView({
                       <span>{signal.api_name || `信号 ${signal.id}`}</span>
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="whitespace-nowrap">
                     {isOwnSignal ? (
                       <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50/50">自有</Badge>
                     ) : (
                       <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50/50">{otherStudioLabel}</Badge>
                     )}
                   </TableCell>
-                  <TableCell className="tabular-nums">{signal.usdt.toFixed(2)} USDT</TableCell>
-                  <TableCell className="text-muted-foreground text-sm">
+                  <TableCell className="tabular-nums whitespace-nowrap">{signal.usdt.toFixed(2)} USDT</TableCell>
+                  <TableCell className="text-muted-foreground text-sm whitespace-nowrap">
                     {followers.length} 个跟单
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right whitespace-nowrap">
                     <Button
                       variant="link"
                       className="px-0 text-blue-600 hover:text-blue-700 h-auto font-medium"
@@ -109,7 +110,7 @@ export function SignalTableView({
 
                 {isExpanded && followers.map((follower) => (
                   <TableRow key={`${signal.id}-${follower.follower_api_id}`} className="bg-background hover:bg-muted/30">
-                    <TableCell className="pl-[3.25rem]">
+                    <TableCell className="pl-[3.25rem] whitespace-nowrap">
                       <div className="flex items-center gap-2 text-sm text-muted-foreground relative">
                         <div className="absolute -left-6 top-1/2 h-px w-4 bg-border/80" />
                         <div className="absolute -left-6 -top-4 h-8 w-px bg-border/80" />
@@ -119,9 +120,9 @@ export function SignalTableView({
                     {/*<TableCell className="text-muted-foreground text-sm">*/}
                     {/*  {follower.follower_studio_id === currentStudioId ? '自有' : `工作室 #${follower.follower_studio_id}`}*/}
                     {/*</TableCell>*/}
-                    <TableCell className="text-muted-foreground text-sm"></TableCell>
-                    <TableCell className="text-muted-foreground text-sm"></TableCell>
-                    <TableCell>
+                    <TableCell className="text-muted-foreground text-sm whitespace-nowrap"></TableCell>
+                    <TableCell className="text-muted-foreground text-sm whitespace-nowrap"></TableCell>
+                    <TableCell className="whitespace-nowrap">
                       <Badge variant="secondary" className="font-mono text-xs border-transparent bg-muted/80">
                         x {follower.ratio}
                       </Badge>
@@ -142,7 +143,8 @@ export function SignalTableView({
             );
           })}
         </TableBody>
-      </Table>
+        </Table>
+      </div>
     </div>
   );
 }
