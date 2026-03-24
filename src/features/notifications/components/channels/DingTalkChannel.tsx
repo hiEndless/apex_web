@@ -15,7 +15,7 @@ const STEPS = [
   '打开钉钉，进入需要接收通知的群聊',
   '点击右上角"..."  ->  群设置  ->  智能群助手  ->  添加机器人',
   '选择"自定义（通过 Webhook 接入自定义服务）"',
-  '设置机器人名称，安全设置建议选择"加签"并记录密钥',
+  '设置机器人名称，安全设置必须选择"加签"并记录密钥，不要选择关键词',
   '完成后复制 Webhook 地址，粘贴到下方输入框',
 ];
 
@@ -58,7 +58,7 @@ export function DingTalkChannel({ form }: ChannelProps) {
         name="config.dingtalk_secret"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>签名密钥（可选）</FormLabel>
+            <FormLabel>签名密钥</FormLabel>
             <FormControl>
               <Input type="password" placeholder="SEC..." {...field} value={field.value || ''} />
             </FormControl>
