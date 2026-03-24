@@ -446,20 +446,21 @@ export default function PositionsHistoryPage() {
             ) : null}
           </div>
         </CardHeader>
-        <CardContent className='min-w-0 px-3 sm:px-6'>
+        <CardContent className='min-w-0 p-0 sm:px-6 sm:pb-6'>
           {error ? (
-            <div className='rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground'>
+            <div className='m-3 sm:m-0 rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground'>
               {error}
             </div>
           ) : loading ? null : records.length === 0 ? (
-            <div className='rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground'>
+            <div className='m-3 sm:m-0 rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground'>
               暂无历史持仓
             </div>
           ) : (
-            <div className='min-w-0 overflow-x-auto overscroll-x-contain pb-1 [touch-action:pan-x] [-webkit-overflow-scrolling:touch]'>
-              <Table className='min-w-[1100px]'>
-                <TableHeader>
-                  <TableRow>
+            <div className='relative w-full max-w-[100vw] sm:max-w-full overflow-hidden'>
+              <div className='overflow-x-auto pb-4 px-3 sm:px-0'>
+                <Table className='w-full min-w-[1100px]'>
+                  <TableHeader>
+                    <TableRow>
                     <TableHead>信号ID</TableHead>
                     <TableHead>交易对</TableHead>
                     <TableHead>杠杆</TableHead>
@@ -511,11 +512,12 @@ export default function PositionsHistoryPage() {
                     );
                   })}
                 </TableBody>
-              </Table>
+                </Table>
+              </div>
             </div>
           )}
           {!loading && !error && records.length > 0 ? (
-            <div className='mt-4 flex min-w-0 flex-wrap items-center justify-between gap-3 border-t pt-4 text-sm text-muted-foreground'>
+            <div className='mt-4 flex min-w-0 flex-wrap items-center justify-between gap-3 border-t pt-4 px-3 sm:px-0 text-sm text-muted-foreground'>
               <span>
                 共 {records.length} 条，每页 {PAGE_SIZE} 条
               </span>
