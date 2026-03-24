@@ -116,10 +116,11 @@ export function SignalTableView({
                         <span>{follower.follower_api_name || `API ${follower.follower_api_id}`}</span>
                       </div>
                     </TableCell>
-                    <TableCell className="text-muted-foreground text-sm">
-                      {follower.follower_studio_id === currentStudioId ? '自有' : `工作室 #${follower.follower_studio_id}`}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground text-sm">-</TableCell>
+                    {/*<TableCell className="text-muted-foreground text-sm">*/}
+                    {/*  {follower.follower_studio_id === currentStudioId ? '自有' : `工作室 #${follower.follower_studio_id}`}*/}
+                    {/*</TableCell>*/}
+                    <TableCell className="text-muted-foreground text-sm"></TableCell>
+                    <TableCell className="text-muted-foreground text-sm"></TableCell>
                     <TableCell>
                       <Badge variant="secondary" className="font-mono text-xs border-transparent bg-muted/80">
                         x {follower.ratio}
