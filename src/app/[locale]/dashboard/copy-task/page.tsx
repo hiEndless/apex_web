@@ -2,7 +2,7 @@
 
 import { authApi, type StudioListItem } from '@/api/auth';
 import { settingsApi } from '@/api/settings';
-import { apiClient } from '@/api/client';
+import { copyTaskApi, type PnlStatsItem, type PnlStatsResponse, type GroupedBinding } from '@/api/copy-task';
 import PageContainer from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
 import { getAccessTokenStudioId } from '@/api/client';
@@ -14,7 +14,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import { SignalGridView, type GroupedBinding } from './components/signal-grid-view';
+import { SignalGridView } from './components/signal-grid-view';
 import { SignalTableView } from './components/signal-table-view';
 
 export default function CopyTaskPage() {
@@ -23,6 +23,7 @@ export default function CopyTaskPage() {
   const [accounts, setAccounts] = useState<ExchangeAccount[]>([]);
   const [studioNamesById, setStudioNamesById] = useState<Record<number, string>>({});
   const [groupedBindings, setGroupedBindings] = useState<Record<string, GroupedBinding>>({});
+  const [pnlStats, setPnlStats] = useState<Record<number, PnlStatsItem>>({});
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
 
   useEffect(() => {
@@ -30,15 +31,24 @@ export default function CopyTaskPage() {
       setLoading(true);
       try {
         const includeTeamStudios = getSessionDisplay().is_team_manager === true;
-        const [data, studios, bindingsRes] = await Promise.all([
+        const [data, studios, bindingsRes, pnlRes] = await Promise.all([
           settingsApi.getExchangeAccounts({ includeTeamStudios }),
           includeTeamStudios ? authApi.listStudios() : Promise.resolve<StudioListItem[]>([]),
-          apiClient.get<Record<string, GroupedBinding>>('/api/copy-task/follow-bindings/grouped').catch(() => ({})),
+          copyTaskApi.getGroupedBindings().catch(() => ({})),
+          copyTaskApi.getReadonlyApiPnlStats('7d').catch(() => null),
         ]);
         
         setAccounts(data);
         setGroupedBindings(bindingsRes || {});
         
+        if (pnlRes && pnlRes.items) {
+          const pnlMap: Record<number, PnlStatsItem> = {};
+          pnlRes.items.forEach((item: PnlStatsItem) => {
+            pnlMap[item.api_id] = item;
+          });
+          setPnlStats(pnlMap);
+        }
+
         if (includeTeamStudios && studios.length > 0) {
           const map: Record<number, string> = {};
           for (const s of studios) {
@@ -115,6 +125,7 @@ export default function CopyTaskPage() {
             studioNamesById={studioNamesById}
             currentStudioId={currentStudioId}
             groupedBindings={groupedBindings}
+            pnlStats={pnlStats}
           />
         ) : (
           <SignalTableView
@@ -122,6 +133,7 @@ export default function CopyTaskPage() {
             studioNamesById={studioNamesById}
             currentStudioId={currentStudioId}
             groupedBindings={groupedBindings}
+            pnlStats={pnlStats}
           />
         )
       )}

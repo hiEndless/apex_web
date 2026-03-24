@@ -3,9 +3,11 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { EXCHANGE_LOGO_SRC } from '@/constants/exchange-logo';
-import { TrendingUp } from 'lucide-react';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from '@/i18n/navigation';
+import type { PnlStatsItem, GroupedBinding } from '@/api/copy-task';
+import { cn } from '@/lib/utils';
 
 function MiniCurvePlaceholder() {
   return (
@@ -15,7 +17,8 @@ function MiniCurvePlaceholder() {
           d='M0,16 C14,14 20,6 34,7 C48,9 54,16 68,14 C82,11 88,4 100,5'
           fill='none'
           stroke='currentColor'
-          strokeWidth='1.4'
+          strokeWidth='1.5'
+          vectorEffect='non-scaling-stroke'
           className='text-muted-foreground/40'
         />
       </svg>
@@ -23,23 +26,75 @@ function MiniCurvePlaceholder() {
   );
 }
 
-export type GroupedBinding = {
-  trader_api_id: number;
-  trader_api_name: string;
-  trader_studio_id: number;
-  followers: {
-    follower_api_id: number;
-    follower_api_name: string;
-    follower_studio_id: number;
-    ratio: number;
-  }[];
-};
+function MiniCurve({ data }: { data: PnlStatsItem['daily_curve'] }) {
+  if (!data || data.length === 0) return <MiniCurvePlaceholder />;
+
+  // Normalize data for SVG
+  const values = data.map((d) => parseFloat(d.cum_pnl || '0'));
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min;
+  
+  const width = 100;
+  const height = 22;
+  const padding = 2; // padding top and bottom
+
+  const points = values.map((val, i) => {
+    // 7 days data will have 7 points. x values: 0, 16.66, 33.33, 50, 66.66, 83.33, 100
+    const x = (i / (values.length - 1 || 1)) * width;
+    // Normalize y to fit in height (invert y because SVG 0 is top)
+    let y = height / 2;
+    if (range > 0) {
+      y = height - padding - ((val - min) / range) * (height - 2 * padding);
+    }
+    return { x, y };
+  });
+
+  // Build curved path using smooth cubic bezier approximation
+  let pathD = '';
+  if (points.length > 0) {
+    pathD = `M ${points[0].x},${points[0].y}`;
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i];
+      const p1 = points[i + 1];
+      
+      // Calculate control points for a smooth curve between p0 and p1
+      // By using horizontal control points, we ensure the curve is smooth and doesn't overshoot vertically
+      const cp1x = p0.x + (p1.x - p0.x) / 2;
+      const cp1y = p0.y;
+      
+      const cp2x = p0.x + (p1.x - p0.x) / 2;
+      const cp2y = p1.y;
+
+      pathD += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${p1.x},${p1.y}`;
+    }
+  }
+  // Since cum_pnl represents total profit accumulated in this period, we check if the last day is >= 0
+  // Or check if the last day's cum_pnl is >= the first day's cum_pnl
+  const isPositive = values[values.length - 1] >= 0;
+
+  return (
+    <div className='flex h-9 w-full items-center rounded bg-background/50 px-1.5'>
+      <svg viewBox={`0 0 ${width} ${height}`} className='h-full w-full' preserveAspectRatio='none'>
+        <path
+          d={pathD}
+          fill='none'
+          stroke='currentColor'
+          strokeWidth='1.5'
+          vectorEffect='non-scaling-stroke'
+          className={isPositive ? 'text-green-500' : 'text-red-500'}
+        />
+      </svg>
+    </div>
+  );
+}
 
 interface SignalGridViewProps {
   signalApis: ExchangeAccount[];
   studioNamesById: Record<number, string>;
   currentStudioId: number | null;
   groupedBindings: Record<string, GroupedBinding>;
+  pnlStats?: Record<number, PnlStatsItem>;
 }
 
 export function SignalGridView({
@@ -47,6 +102,7 @@ export function SignalGridView({
   studioNamesById,
   currentStudioId,
   groupedBindings,
+  pnlStats = {},
 }: SignalGridViewProps) {
   const router = useRouter();
 
@@ -109,18 +165,45 @@ export function SignalGridView({
               <div className='flex gap-2 rounded-lg border border-border/40 bg-muted/10 p-2'>
                 <div className='flex min-w-0 flex-1 flex-col justify-center gap-0.5'>
                   <p className='text-[10px] font-medium leading-none text-muted-foreground'>
-                    最近7天（预留）
+                    7天收益(USDT)
                   </p>
-                  <div className='flex items-baseline gap-1 text-lg font-semibold tabular-nums tracking-tight text-muted-foreground/75'>
-                    <TrendingUp className='h-3 w-3 shrink-0 opacity-65' aria-hidden />
-                    <span>--</span>
+                  <div className={cn('flex items-baseline gap-1 text-lg font-semibold tabular-nums tracking-tight', 
+                    (() => {
+                      const pnlStr = pnlStats[signal.id]?.summary?.total_pnl;
+                      if (!pnlStr) return 'text-muted-foreground/75';
+                      const pnlNum = parseFloat(pnlStr);
+                      if (pnlNum > 0) return 'text-green-500';
+                      if (pnlNum < 0) return 'text-red-500';
+                      return 'text-muted-foreground/75';
+                    })()
+                  )}>
+                    {(() => {
+                      const pnlStr = pnlStats[signal.id]?.summary?.total_pnl;
+                      if (!pnlStr) return <TrendingUp className='h-3 w-3 shrink-0 opacity-40' aria-hidden />;
+                      const pnlNum = parseFloat(pnlStr);
+                      if (pnlNum > 0) return <TrendingUp className='h-3 w-3 shrink-0 opacity-80' aria-hidden />;
+                      if (pnlNum < 0) return <TrendingDown className='h-3 w-3 shrink-0 opacity-80' aria-hidden />;
+                      return <TrendingUp className='h-3 w-3 shrink-0 opacity-40' aria-hidden />;
+                    })()}
+                    <span>
+                      {(() => {
+                        const pnlStr = pnlStats[signal.id]?.summary?.total_pnl;
+                        if (!pnlStr) return '--';
+                        const pnlNum = parseFloat(pnlStr);
+                        return `${pnlNum > 0 ? '+' : ''}${pnlNum.toFixed(2)}`;
+                      })()}
+                    </span>
                   </div>
                 </div>
                 <div className='flex w-[46%] max-w-[120px] shrink-0 flex-col justify-center gap-0.5'>
-                  <p className='text-[10px] font-medium leading-none text-muted-foreground'>
-                    曲线（预留）
-                  </p>
-                  <MiniCurvePlaceholder />
+                  {/* <p className='text-[10px] font-medium leading-none text-muted-foreground'>
+                    收益曲线
+                  </p> */}
+                  {pnlStats[signal.id] ? (
+                    <MiniCurve data={pnlStats[signal.id].daily_curve} />
+                  ) : (
+                    <MiniCurvePlaceholder />
+                  )}
                 </div>
               </div>
             </CardContent>

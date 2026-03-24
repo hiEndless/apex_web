@@ -3,17 +3,18 @@ import { ExchangeAccount } from '@/features/settings/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { EXCHANGE_LOGO_SRC } from '@/constants/exchange-logo';
-import { GroupedBinding } from './signal-grid-view';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { useRouter } from '@/i18n/navigation';
 import { ChevronRight, ChevronDown } from 'lucide-react';
+import type { PnlStatsItem, GroupedBinding } from '@/api/copy-task';
 
 interface SignalTableViewProps {
   signalApis: ExchangeAccount[];
   studioNamesById: Record<number, string>;
   currentStudioId: number | null;
   groupedBindings: Record<string, GroupedBinding>;
+  pnlStats?: Record<number, PnlStatsItem>;
 }
 
 export function SignalTableView({
@@ -21,6 +22,7 @@ export function SignalTableView({
   studioNamesById,
   currentStudioId,
   groupedBindings,
+  pnlStats = {},
 }: SignalTableViewProps) {
   const router = useRouter();
   // 默认全部展开
