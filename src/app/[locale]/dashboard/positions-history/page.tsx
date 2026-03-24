@@ -60,14 +60,14 @@ function formatTimeMs(msText?: string | null) {
   return new Date(ms).toLocaleString();
 }
 
-/** 开仓/平仓均价：>1 保留 2 位小数；≤1 使用原始字符串，不做小数位抹除 */
+/** 开仓/平仓均价：>=1 保留 2 位小数；<1 保留 8 位小数 */
 function formatAvgPx(value?: string | null) {
   const raw = String(value ?? '').trim();
   if (!raw) return '-';
   const n = parseFloat(raw);
   if (!Number.isFinite(n)) return '-';
-  if (n > 1) return n.toFixed(2);
-  return raw;
+  if (n >= 1) return n.toFixed(2);
+  return n.toFixed(8);
 }
 
 /** 手续费：保留 2 位小数 */
