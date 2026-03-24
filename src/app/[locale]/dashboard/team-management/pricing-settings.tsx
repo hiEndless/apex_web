@@ -41,8 +41,8 @@ export function PricingSettings() {
         });
       }
       setPrices(newPrices);
-    } catch (error) {
-      toast.error('获取价格设置失败');
+    } catch (error: any) {
+      toast.error(error.message || '获取价格设置失败');
     } finally {
       setLoading(false);
     }
@@ -63,8 +63,8 @@ export function PricingSettings() {
     try {
       await teamManagementApi.updateTeamOverride(code, price);
       toast.success('价格设置已保存');
-    } catch (error) {
-      toast.error('保存失败，请重试');
+    } catch (error: any) {
+      toast.error(error.message || '保存失败，请重试');
     } finally {
       setSaving(null);
     }
