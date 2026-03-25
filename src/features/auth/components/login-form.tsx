@@ -4,9 +4,14 @@ import { useState } from 'react'
 
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
 
-import { ApiError } from '@/api/client'
+import { ApiError, getAccessTokenStudioId } from '@/api/client'
 import { authApi } from '@/api/auth'
-import { persistAuthToken, persistRefreshToken, persistSessionDisplay } from '@/lib/auth-session'
+import {
+  persistAuthToken,
+  persistRefreshToken,
+  persistSessionDisplay,
+  persistSuperAdminBaseStudioId,
+} from '@/lib/auth-session'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
@@ -38,6 +43,14 @@ const LoginForm = () => {
         is_super_admin: data.is_super_admin,
         is_team_manager: data.is_team_manager,
       })
+      // 新登录时重置一次，确保不会沿用上一次账号残留的“主工作室 id”
+      persistSuperAdminBaseStudioId(null)
+      // 接口可能未带 studio_id，但 JWT 内已有（persistAuthToken 之后可读）
+      const superAdminHomeId =
+        data.is_super_admin === true
+          ? (data.studio_id ?? getAccessTokenStudioId())
+          : null
+      persistSuperAdminBaseStudioId(superAdminHomeId)
       router.push('/dashboard')
     } catch (err) {
       const message = err instanceof ApiError ? err.message : '登录失败，请重试'

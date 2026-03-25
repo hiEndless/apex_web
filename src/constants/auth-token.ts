@@ -17,3 +17,10 @@ export const SESSION_STUDIO_NAME_KEY = 'apex_session_studio_name'
 export const SESSION_IS_SUPER_ADMIN_KEY = 'apex_session_is_super_admin'
 /** 对应后端 is_team_manager，可切换团队下工作室 */
 export const SESSION_IS_TEAM_MANAGER_KEY = 'apex_session_is_team_manager'
+
+/**
+ * 用于区分 super admin 的“主工作室”展示上下文：
+ * - 登录/续期成功时写入一次
+ * - 切换工作室时不更新，避免导致“系统跟单信号”误展示
+ */
+export const SESSION_SUPER_ADMIN_BASE_STUDIO_ID_KEY = 'apex_session_super_admin_base_studio_id'

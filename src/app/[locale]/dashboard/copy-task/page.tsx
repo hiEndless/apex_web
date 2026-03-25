@@ -75,6 +75,7 @@ export default function CopyTaskPage() {
   );
 
   const currentStudioId = getAccessTokenStudioId();
+  const isSuperAdmin = getSessionDisplay().is_super_admin === true;
 
   return (
     <PageContainer
@@ -97,7 +98,7 @@ export default function CopyTaskPage() {
         <div className='flex h-[40vh] items-center justify-center'>
           <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
         </div>
-      ) : signalApis.length === 0 ? (
+      ) : signalApis.length === 0 && !isSuperAdmin ? (
         <div className='flex min-h-[min(52vh,420px)] flex-col items-center justify-center rounded-xl border border-dashed border-border/50 bg-muted/15 px-6 py-14 text-center'>
           <div
             className='mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-muted/50 ring-1 ring-border/40'

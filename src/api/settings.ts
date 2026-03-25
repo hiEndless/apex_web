@@ -79,4 +79,7 @@ export const settingsApi = {
 
   getCurrentMembership: () =>
     apiClient.get<CurrentMembershipResponse>('/api/settings/memberships/current'),
+
+  getSuperAdminFollowingTraderApis: () =>
+    apiClient.get<ExchangeAccount[]>('/api/admin/settings/exchange-accounts/trader'),
 };

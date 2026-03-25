@@ -7,6 +7,7 @@ import {
   AUTH_REFRESH_TOKEN_STORAGE_KEY,
   SESSION_IS_SUPER_ADMIN_KEY,
   SESSION_IS_TEAM_MANAGER_KEY,
+  SESSION_SUPER_ADMIN_BASE_STUDIO_ID_KEY,
   SESSION_STUDIO_NAME_KEY,
   SESSION_USERNAME_KEY,
 } from '@/constants/auth-token'
@@ -31,6 +32,7 @@ export function clearAuthToken() {
   localStorage.removeItem(SESSION_STUDIO_NAME_KEY)
   localStorage.removeItem(SESSION_IS_SUPER_ADMIN_KEY)
   localStorage.removeItem(SESSION_IS_TEAM_MANAGER_KEY)
+  localStorage.removeItem(SESSION_SUPER_ADMIN_BASE_STUDIO_ID_KEY)
   const secure = window.location.protocol === 'https:' ? '; Secure' : ''
   document.cookie = `${AUTH_TOKEN_COOKIE_NAME}=; Path=/; Max-Age=0; SameSite=Lax${secure}`
 }
@@ -59,6 +61,26 @@ export function persistSessionDisplay(payload: {
     localStorage.setItem(SESSION_IS_TEAM_MANAGER_KEY, '0')
   }
   window.dispatchEvent(new Event('apex-session-updated'))
+}
+
+/**
+ * super admin 主工作室 id（仅登录时显式写入；切换工作室/续期不调用，避免被当前工作室覆盖）。
+ */
+export function persistSuperAdminBaseStudioId(studioId: number | null) {
+  if (typeof window === 'undefined') return
+  if (!Number.isFinite(studioId as number) || studioId == null || studioId <= 0) {
+    localStorage.removeItem(SESSION_SUPER_ADMIN_BASE_STUDIO_ID_KEY)
+    return
+  }
+  localStorage.setItem(SESSION_SUPER_ADMIN_BASE_STUDIO_ID_KEY, String(studioId))
+}
+
+export function getSuperAdminBaseStudioId(): number | null {
+  if (typeof window === 'undefined') return null
+  const raw = localStorage.getItem(SESSION_SUPER_ADMIN_BASE_STUDIO_ID_KEY)
+  if (!raw) return null
+  const n = Number(raw)
+  return Number.isFinite(n) && n > 0 ? n : null
 }
 
 export function getSessionDisplay(): {
