@@ -914,6 +914,18 @@ export default function SignalDetailPage() {
                         <span className='text-sm font-medium'>
                           {api.api_name || `API ${api.id}`}
                         </span>
+                        {api.scope_source === 'admin_owned' && (
+                          <Badge
+                            variant='secondary'
+                            className={`ml-1 h-5 px-1.5 text-[10px] font-normal border-transparent ${
+                              active
+                                ? 'bg-white/20 text-white hover:bg-white/30'
+                                : 'bg-orange-100 text-orange-700 hover:bg-orange-200'
+                            }`}
+                          >
+                            系统
+                          </Badge>
+                        )}
                       </div>
                     </button>
                   );
@@ -1053,6 +1065,18 @@ export default function SignalDetailPage() {
                         <span className='text-xs font-medium'>
                           {api.api_name || `API ${api.id}`}
                         </span>
+                        {api.scope_source === 'admin_owned' && (
+                          <Badge
+                            variant='secondary'
+                            className={`ml-1 h-4 px-1 text-[9px] leading-3 font-normal border-transparent ${
+                              active
+                                ? 'bg-white/20 text-white hover:bg-white/30'
+                                : 'bg-orange-100 text-orange-700 hover:bg-orange-200'
+                            }`}
+                          >
+                            系统
+                          </Badge>
+                        )}
                       </div>
                     </button>
                   );

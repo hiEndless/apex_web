@@ -11,6 +11,7 @@ export interface ExchangeAccount {
   usdt: number;
   uid: string | null;
   created_at: string | null;
+  scope_source?: 'current_studio' | 'admin_owned';
 }
 
 /** 与后端 `CreateApiRequest` 对齐 */
