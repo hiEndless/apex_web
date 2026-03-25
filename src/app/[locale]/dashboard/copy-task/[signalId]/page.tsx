@@ -428,7 +428,7 @@ export default function SignalDetailPage() {
 
     const posZh = formatPosSide(log.pos_side);
     const posText = posZh === '-' ? '持仓' : `${posZh}单`;
-    return `${actionZh} ${log.inst_id} ${posText} ${formatQty(log.quantity)} 个`;
+    return `${actionZh} ${log.inst_id} ${posText} ${formatQty(log.quantity)} 张`;
   };
 
   const actionZhByFollower = (action: string) => {
@@ -451,7 +451,7 @@ export default function SignalDetailPage() {
   }) => {
     const posZh = formatPosSide(log.pos_side);
     const posText = posZh === '-' ? '持仓' : `${posZh}单`;
-    const base = `${actionZhByFollower(log.action)} ${log.inst_id} ${posText} ${formatQty(log.quantity)} 个`;
+    const base = `${actionZhByFollower(log.action)} ${log.inst_id} ${posText} ${formatQty(log.quantity)} 张`;
     if (log.status === 2) {
       const reason = String(log.reason ?? '').trim().slice(0, 200);
       const code = String(log.s_code ?? '').trim();
