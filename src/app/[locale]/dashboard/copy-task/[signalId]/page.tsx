@@ -153,8 +153,29 @@ export default function SignalDetailPage() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const includeTeamStudios = getSessionDisplay().is_team_manager === true;
-        const data = await settingsApi.getExchangeAccounts({ includeTeamStudios });
+        const session = getSessionDisplay();
+        const includeTeamStudios = session.is_team_manager === true;
+        const isSuperAdmin = session.is_super_admin === true;
+        let data = await settingsApi.getExchangeAccounts({ includeTeamStudios });
+
+        // 「系统跟单信号」来自 /api/admin/.../trader，不在普通 exchange-accounts 列表里；合并后才能在下面找到 signal
+        if (
+          isSuperAdmin &&
+          Number.isFinite(signalId) &&
+          signalId > 0 &&
+          !data.some((item) => item.id === signalId && item.is_readonly)
+        ) {
+          const adminTraders = await settingsApi
+            .getSuperAdminFollowingTraderApis()
+            .catch(() => [] as ExchangeAccount[]);
+          const byId = new Map<number, ExchangeAccount>();
+          for (const a of data) byId.set(a.id, a);
+          for (const a of adminTraders ?? []) {
+            if (!byId.has(a.id)) byId.set(a.id, a);
+          }
+          data = Array.from(byId.values()).sort((a, b) => b.id - a.id);
+        }
+
         setAccounts(data);
       } catch (error) {
         const message =
@@ -165,7 +186,7 @@ export default function SignalDetailPage() {
       }
     };
     fetchData();
-  }, []);
+  }, [signalId]);
 
   const signal = useMemo(
     () => accounts.find((item) => item.id === signalId && item.is_readonly),
