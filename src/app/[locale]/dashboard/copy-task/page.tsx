@@ -7,7 +7,7 @@ import PageContainer from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
 import { getAccessTokenStudioId } from '@/api/client';
 import { ExchangeAccount } from '@/features/settings/types';
-import { getSessionDisplay } from '@/lib/auth-session';
+import { getSessionDisplay, getSuperAdminBaseStudioId } from '@/lib/auth-session';
 import { useRouter } from '@/i18n/navigation';
 import { LineChart, Loader2, Plus, LayoutGrid, List } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
@@ -25,6 +25,40 @@ export default function CopyTaskPage() {
   const [groupedBindings, setGroupedBindings] = useState<Record<string, GroupedBinding>>({});
   const [pnlStats, setPnlStats] = useState<Record<number, PnlStatsItem>>({});
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+
+  const [adminSignals, setAdminSignals] = useState<ExchangeAccount[]>([]);
+  const [loadingAdmin, setLoadingAdmin] = useState(false);
+
+  const currentStudioId = getAccessTokenStudioId();
+  const { is_super_admin } = getSessionDisplay();
+  const superAdminBaseStudioId = getSuperAdminBaseStudioId();
+  const shouldShowSystemSignals =
+    Boolean(is_super_admin) &&
+    superAdminBaseStudioId != null &&
+    currentStudioId != null &&
+    currentStudioId === superAdminBaseStudioId;
+
+  useEffect(() => {
+    if (!shouldShowSystemSignals) {
+      setAdminSignals([]);
+      setLoadingAdmin(false);
+      return;
+    }
+
+    let cancelled = false;
+    setLoadingAdmin(true);
+    settingsApi.getSuperAdminFollowingTraderApis()
+      .then(res => {
+        if (!cancelled) setAdminSignals(res || []);
+      })
+      .catch(err => {
+        console.error('Failed to fetch admin signals', err);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingAdmin(false);
+      });
+    return () => { cancelled = true; };
+  }, [shouldShowSystemSignals]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -74,9 +108,6 @@ export default function CopyTaskPage() {
     [accounts]
   );
 
-  const currentStudioId = getAccessTokenStudioId();
-  const isSuperAdmin = getSessionDisplay().is_super_admin === true;
-
   return (
     <PageContainer
       pageTitle='跟单管理'
@@ -98,7 +129,7 @@ export default function CopyTaskPage() {
         <div className='flex h-[40vh] items-center justify-center'>
           <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
         </div>
-      ) : signalApis.length === 0 && !isSuperAdmin ? (
+      ) : signalApis.length === 0 && !is_super_admin ? (
         <div className='flex min-h-[min(52vh,420px)] flex-col items-center justify-center rounded-xl border border-dashed border-border/50 bg-muted/15 px-6 py-14 text-center'>
           <div
             className='mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-muted/50 ring-1 ring-border/40'
@@ -127,6 +158,9 @@ export default function CopyTaskPage() {
             currentStudioId={currentStudioId}
             groupedBindings={groupedBindings}
             pnlStats={pnlStats}
+            adminSignals={adminSignals}
+            loadingAdmin={loadingAdmin}
+            shouldShowSystemSignals={shouldShowSystemSignals}
           />
         ) : (
           <SignalTableView
@@ -135,6 +169,9 @@ export default function CopyTaskPage() {
             currentStudioId={currentStudioId}
             groupedBindings={groupedBindings}
             pnlStats={pnlStats}
+            adminSignals={adminSignals}
+            loadingAdmin={loadingAdmin}
+            shouldShowSystemSignals={shouldShowSystemSignals}
           />
         )
       )}

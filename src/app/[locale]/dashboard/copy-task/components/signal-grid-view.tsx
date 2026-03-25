@@ -8,9 +8,6 @@ import Image from 'next/image';
 import { useRouter } from '@/i18n/navigation';
 import type { PnlStatsItem, GroupedBinding } from '@/api/copy-task';
 import { cn } from '@/lib/utils';
-import { getSessionDisplay, getSuperAdminBaseStudioId } from '@/lib/auth-session';
-import { useEffect, useState } from 'react';
-import { settingsApi } from '@/api/settings';
 
 function MiniCurvePlaceholder() {
   return (
@@ -98,6 +95,9 @@ interface SignalGridViewProps {
   currentStudioId: number | null;
   groupedBindings: Record<string, GroupedBinding>;
   pnlStats?: Record<number, PnlStatsItem>;
+  adminSignals?: ExchangeAccount[];
+  loadingAdmin?: boolean;
+  shouldShowSystemSignals?: boolean;
 }
 
 function SignalCard({
@@ -238,40 +238,11 @@ export function SignalGridView({
   currentStudioId,
   groupedBindings,
   pnlStats = {},
+  adminSignals = [],
+  loadingAdmin = false,
+  shouldShowSystemSignals = false,
 }: SignalGridViewProps) {
   const router = useRouter();
-  const { is_super_admin } = getSessionDisplay();
-  const superAdminBaseStudioId = getSuperAdminBaseStudioId();
-  // 仅当当前 token 工作室 id 与登录时记录的 super admin 主工作室 id 一致时才展示（不做 null 宽松，否则切到其它工作室仍会显示）
-  const shouldShowSystemSignals =
-    Boolean(is_super_admin) &&
-    superAdminBaseStudioId != null &&
-    currentStudioId != null &&
-    currentStudioId === superAdminBaseStudioId;
-  const [adminSignals, setAdminSignals] = useState<ExchangeAccount[]>([]);
-  const [loadingAdmin, setLoadingAdmin] = useState(false);
-
-  useEffect(() => {
-    if (!shouldShowSystemSignals) {
-      setAdminSignals([]);
-      setLoadingAdmin(false);
-      return;
-    }
-
-    let cancelled = false;
-    setLoadingAdmin(true);
-    settingsApi.getSuperAdminFollowingTraderApis()
-      .then(res => {
-        if (!cancelled) setAdminSignals(res || []);
-      })
-      .catch(err => {
-        console.error('Failed to fetch admin signals', err);
-      })
-      .finally(() => {
-        if (!cancelled) setLoadingAdmin(false);
-      });
-    return () => { cancelled = true; };
-  }, [shouldShowSystemSignals]);
 
   return (
     <div className='space-y-8'>

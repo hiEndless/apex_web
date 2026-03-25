@@ -6,7 +6,7 @@ import { EXCHANGE_LOGO_SRC } from '@/constants/exchange-logo';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { useRouter } from '@/i18n/navigation';
-import { ChevronRight, ChevronDown } from 'lucide-react';
+import { ChevronRight, ChevronDown, Loader2 } from 'lucide-react';
 import type { PnlStatsItem, GroupedBinding } from '@/api/copy-task';
 
 interface SignalTableViewProps {
@@ -15,6 +15,9 @@ interface SignalTableViewProps {
   currentStudioId: number | null;
   groupedBindings: Record<string, GroupedBinding>;
   pnlStats?: Record<number, PnlStatsItem>;
+  adminSignals?: ExchangeAccount[];
+  loadingAdmin?: boolean;
+  shouldShowSystemSignals?: boolean;
 }
 
 export function SignalTableView({
@@ -23,11 +26,14 @@ export function SignalTableView({
   currentStudioId,
   groupedBindings,
   pnlStats = {},
+  adminSignals = [],
+  loadingAdmin = false,
+  shouldShowSystemSignals = false,
 }: SignalTableViewProps) {
   const router = useRouter();
   // 默认全部展开
   const [expandedRows, setExpandedRows] = useState<Set<number>>(
-    new Set(signalApis.map((s) => s.id))
+    new Set([...signalApis.map((s) => s.id), ...adminSignals.map((s) => s.id)])
   );
 
   const toggleRow = (id: number) => {
@@ -40,7 +46,7 @@ export function SignalTableView({
     setExpandedRows(next);
   };
 
-  return (
+  const renderTable = (signals: ExchangeAccount[], isAdminSignal = false) => (
     <div className="rounded-md border bg-card">
       <div className="w-full overflow-x-auto overscroll-x-contain">
         <Table className="min-w-[760px]">
@@ -54,17 +60,10 @@ export function SignalTableView({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {signalApis.length === 0 && (
-            <TableRow>
-              <TableCell colSpan={5} className="h-24 text-center">
-                暂无数据
-              </TableCell>
-            </TableRow>
-          )}
-          {signalApis.map((signal) => {
+          {signals.map((signal) => {
             const platformKey = (signal.platform || '').trim().toLowerCase();
             const logoSrc = EXCHANGE_LOGO_SRC[platformKey];
-            const isOwnSignal = currentStudioId == null || signal.studio_id === currentStudioId;
+            const isOwnSignal = !isAdminSignal && (currentStudioId == null || signal.studio_id === currentStudioId);
             const otherStudioLabel =
               studioNamesById[signal.studio_id] ?? `工作室 #${signal.studio_id}`;
             const bindingInfo = groupedBindings[signal.id];
@@ -89,7 +88,9 @@ export function SignalTableView({
                     </div>
                   </TableCell>
                   <TableCell className="whitespace-nowrap">
-                    {isOwnSignal ? (
+                    {isAdminSignal ? (
+                      <Badge variant="outline" className="text-orange-700 border-orange-200 bg-orange-50">系统</Badge>
+                    ) : isOwnSignal ? (
                       <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50/50">自有</Badge>
                     ) : (
                       <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50/50">{otherStudioLabel}</Badge>
@@ -119,9 +120,6 @@ export function SignalTableView({
                         <span>{follower.follower_api_name || `API ${follower.follower_api_id}`}</span>
                       </div>
                     </TableCell>
-                    {/*<TableCell className="text-muted-foreground text-sm">*/}
-                    {/*  {follower.follower_studio_id === currentStudioId ? '自有' : `工作室 #${follower.follower_studio_id}`}*/}
-                    {/*</TableCell>*/}
                     <TableCell className="text-muted-foreground text-sm whitespace-nowrap"></TableCell>
                     <TableCell className="text-muted-foreground text-sm whitespace-nowrap"></TableCell>
                     <TableCell className="whitespace-nowrap">
@@ -146,6 +144,42 @@ export function SignalTableView({
           })}
         </TableBody>
         </Table>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className='space-y-8'>
+      {shouldShowSystemSignals && (adminSignals.length > 0 || loadingAdmin) && (
+        <div className='space-y-4'>
+          <div className='flex items-center gap-4'>
+            <h3 className='text-base font-semibold text-foreground/80 whitespace-nowrap'>系统跟单信号</h3>
+            <div className='h-px flex-1 bg-border/60' />
+          </div>
+          {loadingAdmin ? (
+            <div className='flex items-center justify-center py-8'>
+              <Loader2 className='h-6 w-6 animate-spin text-muted-foreground' />
+            </div>
+          ) : (
+            renderTable(adminSignals, true)
+          )}
+        </div>
+      )}
+
+      <div className='space-y-4'>
+        {shouldShowSystemSignals && (adminSignals.length > 0 || loadingAdmin) && (
+          <div className='flex items-center gap-4'>
+            <h3 className='text-base font-semibold text-foreground/80 whitespace-nowrap'>我的信号</h3>
+            <div className='h-px flex-1 bg-border/60' />
+          </div>
+        )}
+        {signalApis.length === 0 ? (
+           <div className='flex min-h-[min(30vh,200px)] flex-col items-center justify-center rounded-xl border border-dashed border-border/50 bg-muted/15 px-6 py-10 text-center'>
+             <p className='text-sm text-muted-foreground'>暂无我的信号</p>
+           </div>
+        ) : (
+          renderTable(signalApis, false)
+        )}
       </div>
     </div>
   );
