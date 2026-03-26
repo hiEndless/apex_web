@@ -40,7 +40,7 @@ function normalizeRequestError(err: unknown): Error {
     const message = err.message || '';
     if (message.includes('Failed to fetch')) {
       return new ApiError(
-        '网络请求失败，请检查后端服务是否可用，或确认浏览器跨域/插件拦截配置。',
+        '网络请求失败，请检刷新网页，或重新登录。',
         0,
       );
     }
