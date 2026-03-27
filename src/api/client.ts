@@ -40,7 +40,7 @@ function normalizeRequestError(err: unknown): Error {
     const message = err.message || '';
     if (message.includes('Failed to fetch')) {
       return new ApiError(
-        '网络请求失败，请检刷新网页，或重新登录。',
+        '网络请求失败，请检查网络并重试。',
         0,
       );
     }
@@ -256,6 +256,14 @@ async function requestWithAutoRefresh<T>(
     return handleResponse<T>(response);
   } catch (rawErr) {
     const err = normalizeRequestError(rawErr);
+    
+    // 如果是底层网络失败 (Failed to fetch) 且允许重试，则延迟 1.5s 后重试一次
+    // 这可以有效解决设备从休眠唤醒、或切换后台回前台时，网络瞬间断开导致的报错
+    if (retry && err instanceof ApiError && err.status === 0) {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      return requestWithAutoRefresh<T>(method, url, body, options, false);
+    }
+
     if (!retry || skipAuth) throw err;
     if (!(err instanceof ApiError)) throw err;
     if (!AUTH_EXPIRE_RETRY_CODES.has(err.code ?? -1)) throw err;
