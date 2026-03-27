@@ -224,10 +224,10 @@ export default function PositionsPage() {
           {data.items.map((apiItem) => (
             <Card key={apiItem.api_id}>
               <CardHeader>
-                <CardTitle>{`${apiItem.api_name || `API ${apiItem.api_id}`}仓位`}</CardTitle>
-                <CardDescription>
-                  {apiItem.platform.toUpperCase()} API - 当前实时持仓
-                </CardDescription>
+                <CardTitle>{`${apiItem.api_name || `API ${apiItem.api_id}`}`}</CardTitle>
+                {/*<CardDescription>*/}
+                {/*  {apiItem.platform.toUpperCase()} API - 当前实时持仓*/}
+                {/*</CardDescription>*/}
               </CardHeader>
               <CardContent>
                 {!apiItem.ok ? (
