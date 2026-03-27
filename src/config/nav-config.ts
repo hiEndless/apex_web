@@ -60,6 +60,17 @@ export const navItems: NavItem[] = [
     // access: { requireOrg: true, permission: 'org:teams:view' }
   },
   {
+    title: '持仓管理',
+    url: '/dashboard/positions',
+    icon: 'list',
+    isActive: false,
+    items: [],
+    // Require organization to be active
+    // access: { requireOrg: true }
+    // Alternative: require specific permission
+    // access: { requireOrg: true, permission: 'org:teams:view' }
+  },
+  {
     title: '交易员历史持仓',
     url: '/dashboard/positions-history',
     icon: 'product',
