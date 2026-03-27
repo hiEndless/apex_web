@@ -56,6 +56,15 @@ const formatUpl = (upl?: string) => {
   return n.toFixed(3);
 };
 
+const formatPrice = (value?: string | null) => {
+  const raw = String(value ?? '').trim();
+  if (!raw) return '-';
+  const n = parseFloat(raw);
+  if (!Number.isFinite(n)) return '-';
+  if (n >= 1) return n.toFixed(2);
+  return n.toFixed(8);
+};
+
 const formatUplRatioPercent = (uplRatio?: string) => {
   const n = parseFloat(uplRatio ?? '');
   if (!Number.isFinite(n)) return '-';
@@ -273,12 +282,12 @@ export default function PositionsPage() {
 
                             <span className='text-muted-foreground'>开仓价</span>
                             <span className='tabular-nums'>
-                              {item.avgPx ?? '-'}
+                              {formatPrice(item.avgPx)}
                             </span>
 
                             <span className='text-muted-foreground'>标记</span>
                             <span className='tabular-nums'>
-                              {item.markPx ?? '-'}
+                              {formatPrice(item.markPx)}
                             </span>
 
                             <span className='text-muted-foreground'>保证金</span>
@@ -369,8 +378,8 @@ export default function PositionsPage() {
                                 {getDirectionInfo(item).label}
                               </TableCell>
                               <TableCell>{formatAbsPos(item.pos)}</TableCell>
-                              <TableCell>{item.avgPx ?? '-'}</TableCell>
-                              <TableCell>{item.markPx ?? '-'}</TableCell>
+                              <TableCell>{formatPrice(item.avgPx)}</TableCell>
+                              <TableCell>{formatPrice(item.markPx)}</TableCell>
                               <TableCell>{formatMargin(item.margin)}</TableCell>
                               <TableCell className={getUplClass(item.upl)}>
                                 {formatUpl(item.upl)}
