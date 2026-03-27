@@ -150,11 +150,11 @@ export function DateTimeRangePicker({
         <PopoverContent
           align='start'
           sideOffset={6}
-          className='w-auto max-w-[min(100vw-1rem,18.5rem)] overflow-hidden rounded-md border border-border bg-popover p-0 shadow-none outline-none'
+          className='w-[18.5rem] max-w-[min(100vw-1rem,18.5rem)] overflow-hidden rounded-md border border-border bg-popover p-0 shadow-none outline-none'
         >
           <Calendar
             mode='range'
-            className='p-2 [--cell-size:1.75rem]'
+            className='p-2 w-full [--cell-size:2rem]'
             showOutsideDays={false}
             selected={range}
             onSelect={(r) => {
