@@ -149,7 +149,7 @@ export default function BillsPage() {
           </CardContent>
         </Card>
 
-        <Card className='min-w-0 border shadow-none'>
+        <Card className='min-w-0 border shadow-none pb-0'>
           <div className='overflow-x-auto'>
             <Table className='min-w-[800px]'>
               <TableHeader>
