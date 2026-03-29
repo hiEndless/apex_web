@@ -119,7 +119,7 @@ export default function BillsPage() {
           <CardContent className='w-full min-w-0 max-w-full overflow-x-auto px-3 pt-0 sm:px-4'>
             <div className='flex items-end gap-3'>
               <div className='w-[200px] space-y-1'>
-                <div className='text-xs text-muted-foreground'>信号 (仅只读API)</div>
+                <div className='text-xs text-muted-foreground'>信号</div>
                 <Select
                   value={selectedApiId === '' ? '' : String(selectedApiId)}
                   onValueChange={(v) => setSelectedApiId(Number(v))}
