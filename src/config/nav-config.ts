@@ -78,6 +78,14 @@ export const navItems: NavItem[] = [
     isActive: false,
     items: []
   },
+  {
+    title: '交易员资金流水',
+    url: '/dashboard/bills',
+    icon: 'bills',
+    shortcut: ['bi', 'bi'],
+    isActive: false,
+    items: []
+  },
   // {
   //   title: 'Kanban',
   //   url: '/dashboard/kanban',
