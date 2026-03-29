@@ -109,7 +109,7 @@ export default function BillsPage() {
   return (
     <PageContainer
       pageTitle='资金流水'
-      pageDescription='只读信号API的最近资金流水'
+      pageDescription='信号API的最近资金流水'
     >
       <div className='w-full min-w-0 max-w-full space-y-4'>
         <Card className='min-w-0 gap-0 overflow-hidden border py-4 shadow-none'>
