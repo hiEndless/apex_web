@@ -25,6 +25,7 @@ const FILTER_CTRL =
 
 type PositionsHistoryItem = {
   api_id?: number;
+  api_name?: string | null;
   inst_id?: string | null;
   lever?: string | null;
   direction?: string | null;
@@ -497,7 +498,7 @@ export default function PositionsHistoryPage() {
                 <Table className='w-full min-w-[900px] whitespace-nowrap lg:min-w-[1100px]'>
                   <TableHeader>
                     <TableRow>
-                    <TableHead>信号ID</TableHead>
+                    <TableHead>信号</TableHead>
                     <TableHead>交易对</TableHead>
                     <TableHead>杠杆</TableHead>
                     <TableHead>方向</TableHead>
@@ -525,7 +526,7 @@ export default function PositionsHistoryPage() {
                     const rowKey = `${item.api_id ?? 'na'}-${item.inst_id ?? 'na'}-${item.c_time ?? 'na'}-${(page - 1) * PAGE_SIZE + idx}`;
                     return (
                       <TableRow key={rowKey}>
-                        <TableCell>{item.api_id ?? '-'}</TableCell>
+                        <TableCell>{item.api_name ?? '-'}</TableCell>
                         <TableCell>{item.inst_id ?? '-'}</TableCell>
                         <TableCell>
                           {getLeverBadgeText(item.lever) ? (
