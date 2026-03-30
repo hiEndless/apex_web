@@ -139,6 +139,7 @@ export default function PositionsHistoryPage() {
   const [records, setRecords] = useState<PositionsHistoryItem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
+  const [syncing, setSyncing] = useState(false);
 
   const [signals, setSignals] = useState<Array<{ id: number; api_name?: string }>>([]);
   const [filters, setFilters] = useState<FilterState>({
@@ -220,6 +221,28 @@ export default function PositionsHistoryPage() {
       setPage(1);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSync = async () => {
+    if (filters.apiId === '') {
+      toast.error('请先在「信号」筛选中选择特定信号');
+      return;
+    }
+    setSyncing(true);
+    try {
+      await apiClient.post('/api/positions/trade-records/sync-close-history', {
+        api_id: Number(filters.apiId),
+        inst_id: filters.instId.trim() || '',
+        limit: 100,
+      });
+      toast.success('历史仓位更新成功');
+      void fetchRecords();
+    } catch (e) {
+      const message = e instanceof Error ? e.message : '更新历史仓位失败，请稍后重试';
+      toast.error(message);
+    } finally {
+      setSyncing(false);
     }
   };
 
@@ -390,6 +413,15 @@ export default function PositionsHistoryPage() {
                     }}
                   >
                     查询
+                  </Button>
+                  <Button
+                    size='sm'
+                    className='h-8 text-xs shadow-none bg-blue-600 text-white hover:bg-blue-700'
+                    disabled={syncing}
+                    onClick={handleSync}
+                  >
+                    {syncing ? <Loader2 className='mr-1.5 h-3.5 w-3.5 animate-spin' /> : null}
+                    更新
                   </Button>
                   <Button
                     variant='outline'
