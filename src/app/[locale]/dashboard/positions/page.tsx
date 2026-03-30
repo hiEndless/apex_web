@@ -231,7 +231,7 @@ export default function PositionsPage() {
       ) : (
         <div className='space-y-6'>
           {data.items.map((apiItem) => (
-            <Card key={apiItem.api_id}>
+            <Card key={apiItem.api_id} className='pb-0'>
               <CardHeader>
                 <CardTitle>{`${apiItem.api_name || `API ${apiItem.api_id}`}`}</CardTitle>
                 {/*<CardDescription>*/}
