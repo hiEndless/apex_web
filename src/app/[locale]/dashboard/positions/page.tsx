@@ -316,9 +316,9 @@ export default function PositionsPage() {
 
                             <div className='w-full mt-2'>
                               <Button
-                                variant='destructive'
+                                variant='default'
                                 size='sm'
-                                className='w-full h-8 text-xs'
+                                className='w-full h-8 text-xs shadow-none'
                                 onClick={() => {
                                   setCloseTarget({
                                     apiId: apiItem.api_id,
@@ -392,9 +392,9 @@ export default function PositionsPage() {
                               <TableCell>{formatOpenTime(item.cTime)}</TableCell>
                               <TableCell className='text-right'>
                                 <Button
-                                  variant='destructive'
+                                  variant='default'
                                   size='sm'
-                                  className='h-7 px-2 text-xs'
+                                  className='h-7 px-2 text-xs shadow-none'
                                   onClick={() => {
                                     setCloseTarget({
                                       apiId: apiItem.api_id,

@@ -258,15 +258,15 @@ export default function PositionsHistoryPage() {
       pageDescription='历史平仓记录'
     >
       <div className='w-full min-w-0 max-w-full space-y-4'>
-      <div className='mb-4 flex flex-wrap items-center gap-2'>
-        <Link
-          href='/dashboard/copy-task'
-          className='inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted/40'
-        >
-          <ArrowLeft className='h-4 w-4' />
-          返回跟单管理
-        </Link>
-      </div>
+      {/*<div className='mb-4 flex flex-wrap items-center gap-2'>*/}
+      {/*  <Link*/}
+      {/*    href='/dashboard/copy-task'*/}
+      {/*    className='inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-muted/40'*/}
+      {/*  >*/}
+      {/*    <ArrowLeft className='h-4 w-4' />*/}
+      {/*    返回跟单管理*/}
+      {/*  </Link>*/}
+      {/*</div>*/}
 
       <Card className='mb-4 min-w-0 gap-0 overflow-hidden border py-4 shadow-none'>
         <CardHeader className='px-3 pb-2 pt-0 sm:px-4'>
