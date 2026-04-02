@@ -76,7 +76,7 @@ function PeriodCard({
 export function PnlSummaryCards() {
   return (
     <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-      <PeriodCard title="今天盈利" days={1} badgeContent="Daily" svg={<RatingsCardSvg />} />
+      <PeriodCard title="今日盈利" days={1} badgeContent="Daily" svg={<RatingsCardSvg />} />
       <PeriodCard title="最近7天盈利" days={7} badgeContent="Last Week" svg={<SessionCardSvg />} />
       <PeriodCard title="最近14天盈利" days={14} badgeContent="Last 2 Weeks" svg={<CustomersCardSvg />} />
       <PeriodCard title="最近30天盈利" days={30} badgeContent="Last Month" svg={<TotalOrdersCardSvg />} />

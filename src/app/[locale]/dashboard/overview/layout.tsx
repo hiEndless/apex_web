@@ -37,13 +37,13 @@ export default function OverViewLayout({
           {/* Left side: 4 rankings in a 2x2 grid */}
           <div className='col-span-2 grid grid-cols-1 gap-4 md:grid-cols-2 h-full'>
             <div className='min-h-[200px]'>
-              <RankingList title="今天收益" days={1} type="pnl" />
+              <RankingList title="今日收益" days={1} type="pnl" />
             </div>
             <div className='min-h-[200px]'>
               <RankingList title="最近7天收益" days={7} type="pnl" />
             </div>
             <div className='min-h-[200px]'>
-              <RankingList title="今天交易次数" days={1} type="trade_count" />
+              <RankingList title="今日交易次数" days={1} type="trade_count" />
             </div>
             <div className='min-h-[200px]'>
               <RankingList title="最近7天交易次数" days={7} type="trade_count" />
