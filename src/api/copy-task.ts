@@ -37,6 +37,21 @@ export interface PnlStatsResponse {
   items: PnlStatsItem[];
 }
 
+export interface TimelineLogItem {
+  id: number;
+  event_ts: number;
+  created_at: string;
+  trader_api_id: number;
+  trader_api_name: string;
+  inst_id: string;
+  action: string;
+  side: string;
+  pos_side: string;
+  quantity: string;
+  leverage: string;
+  price: string;
+}
+
 export const copyTaskApi = {
   getGroupedBindings: () => {
     return apiClient.get<Record<string, GroupedBinding>>('/api/copy-task/follow-bindings/grouped');
@@ -44,5 +59,15 @@ export const copyTaskApi = {
 
   getReadonlyApiPnlStats: (interval: string = '7d') => {
     return apiClient.get<PnlStatsResponse>(`/api/positions/pnl/readonly?interval=${interval}`);
+  },
+
+  getTraderTimeline: (params?: { start_at?: string; end_at?: string; order?: 'asc' | 'desc'; limit?: number }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.start_at) searchParams.append('start_at', params.start_at);
+    if (params?.end_at) searchParams.append('end_at', params.end_at);
+    if (params?.order) searchParams.append('order', params.order);
+    if (params?.limit) searchParams.append('limit', params.limit.toString());
+    const query = searchParams.toString();
+    return apiClient.get<TimelineLogItem[]>(`/api/copy-task/logs/trader-timeline${query ? `?${query}` : ''}`);
   }
 };
